@@ -59,7 +59,7 @@ urlpatterns = patterns('',
     (r'^book/(?P<book_id>\d+)/view$', 'pathagar.books.views.book_detail'),
     (r'^book/(?P<book_id>\d+)/edit$', 'pathagar.books.views.edit_book'),
     (r'^book/(?P<book_id>\d+)/remove$', 'pathagar.books.views.remove_book'),
-    (r'^book/(?P<book_id>\d+)/download$', 'pathagar.books.views.download_book'),
+    (r'^book/(?P<book_id>\d+)/download/(?P<filename>.+)$', 'pathagar.books.views.download_book'),
 
     # Add language:
     (r'^add/dc_language|language/$', 'pathagar.books.views.add_language'),
@@ -84,3 +84,4 @@ if BOOKS_STATICS_VIA_DJANGO:
        url(r'^covers/(?P<path>.*)$', serve,
            {'document_root': os.path.join(settings.MEDIA_ROOT, 'covers')}),
     )
+

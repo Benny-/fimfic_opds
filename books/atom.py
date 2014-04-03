@@ -32,7 +32,6 @@
 from xml.sax.saxutils import XMLGenerator
 from datetime import datetime
 
-
 GENERATOR_TEXT = 'django-atompub'
 GENERATOR_ATTR = {
     'uri': 'http://code.google.com/p/django-atompub/',
@@ -239,10 +238,11 @@ class AtomFeed(object):
             return datetime.now() # @@@ really we should allow a feed to define its "start" for this case
 
 
-    def write_text_construct(self, handler, element_name, data, tabs=1):
+    def write_text_construct(self, handler, element_name, data, tabs=2):
         if isinstance(data, tuple):
             text_type, text = data
             if text_type == 'xhtml':
+                handler.characters("\t\t")
                 handler.startElement(element_name, {'type': text_type})
                 handler._write(text) # write unescaped -- it had better be well-formed XML
                 handler.endElement(element_name)
@@ -272,8 +272,8 @@ class AtomFeed(object):
         handler.addQuickElement(u'link', None, link, tabs=tabs)
 
 
-    def write_category_construct(self, handler, category):
-        handler.addQuickElement(u'category', None, category)
+    def write_category_construct(self, handler, category, tabs=2):
+        handler.addQuickElement(u'category', None, {'term':category}, tabs )
 
 
     def write_source(self, handler, data):
@@ -308,14 +308,15 @@ class AtomFeed(object):
         if isinstance(data, tuple):
             content_dict, text = data
             if content_dict.get('type') == 'xhtml':
+                handler.characters("\t\t")
                 handler.startElement(u'content', content_dict)
                 handler._write(text) # write unescaped -- it had better be well-formed XML
                 handler.endElement(u'content')
             else:
+                handler.characters("\t\t")
                 handler.addQuickElement(u'content', text, content_dict)
-                handler.characters("\t")
         else:
-            handler.characters("\t")
+            handler.characters("\t\t")
             handler.addQuickElement(u'content', data)
 
 
@@ -504,73 +505,3 @@ class AtomFeed(object):
 
         return
 
-
-
-class LegacySyndicationFeed(AtomFeed):
-    """
-    Provides an SyndicationFeed-compatible interface in its __init__ and
-    add_item but is really a new AtomFeed object.
-    """
-
-    def __init__(self, title, link, description, language=None, author_email=None,
-            author_name=None, author_link=None, subtitle=None, categories=[],
-            feed_url=None, feed_copyright=None):
-
-        atom_id = link
-        title = title
-        updated = None # will be calculated
-        rights = feed_copyright
-        subtitle = subtitle
-        author_dict = {'name': author_name}
-        if author_link:
-            author_dict['uri'] = author_uri
-        if author_email:
-            author_dict['email'] = author_email
-        authors = [author_dict]
-        if categories:
-            categories = [{'term': term} for term in categories]
-        links = [{'rel': 'alternate', 'href': link}]
-        if feed_url:
-            links.append({'rel': 'self', 'href': feed_url})
-        if language:
-            extra_attrs = {'xml:lang': language}
-        else:
-            extra_attrs = {}
-
-        # description ignored (as with Atom1Feed)
-
-        AtomFeed.__init__(self, atom_id, title, updated, rights=rights, subtitle=subtitle,
-                authors=authors, categories=categories, links=links, extra_attrs=extra_attrs)
-
-
-    def add_item(self, title, link, description, author_email=None,
-            author_name=None, author_link=None, pubdate=None, comments=None,
-            unique_id=None, enclosure=None, categories=[], item_copyright=None):
-
-        if unique_id:
-            atom_id = unique_id
-        else:
-            atom_id = get_tag_uri(link, pubdate)
-        title = title
-        updated = pubdate
-        if item_copyright:
-            rights = item_copyright
-        else:
-            rights = None
-        if description:
-            summary = 'html', description
-        else:
-            summary = None
-        author_dict = {'name': author_name}
-        if author_link:
-            author_dict['uri'] = author_uri
-        if author_email:
-            author_dict['email'] = author_email
-        authors = [author_dict]
-        categories = [{'term': term} for term in categories]
-        links = [{'rel': 'alternate', 'href': link}]
-        if enclosure:
-            links.append({'rel': 'enclosure', 'href': enclosure.url, 'length': enclosure.length, 'type': enclosure.mime_type})
-
-        AtomFeed.add_item(self, atom_id, title, updated, rights=rights, summary=summary,
-                authors=authors, categories=categories, links=links)

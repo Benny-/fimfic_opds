@@ -1,4 +1,6 @@
 database.db
-*pyc
+*.pyc
 staticfiles/
-static_media/books
+static_media/books/
+build/
+

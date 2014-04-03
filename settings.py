@@ -15,7 +15,7 @@ import os
 
 # Books settings:
 
-BOOKS_PER_PAGE = 20 # Number of books shown per page in the OPDS
+BOOKS_PER_PAGE = 80 # Number of books shown per page in the OPDS
                     # catalogs and in the HTML pages.
 
 BOOKS_STATICS_VIA_DJANGO = True
@@ -93,5 +93,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'tagging', # TODO old
     'taggit',
-    'pathagar.books'
+    'pathagar.books',
+    'precise_bbcode',
 )
+

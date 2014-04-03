@@ -18,6 +18,7 @@
 from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
+from precise_bbcode.parser import get_parser
 
 from atom import AtomFeed
 import mimetypes
@@ -30,6 +31,8 @@ ATTRS[u'xmlns:opds'] = u'http://opds-spec.org/'
 ATTRS[u'xmlns:dc'] = u'http://purl.org/dc/elements/1.1/'
 ATTRS[u'xmlns:opensearch'] = 'http://a9.com/-/spec/opensearch/1.1/'
 
+FEED_TITLE = 'My Little Pony'
+FEED_DESCRIPTION = 'Ebooks from fimfiction.net'
 
 def __get_mimetype(item):
     if item.mimetype is not None:
@@ -64,20 +67,29 @@ def generate_nav_catalog(subsections, is_root=False):
     links = []
 
     if is_root:
-        links.append({'type': 'application/atom+xml',
+        links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                       'rel': 'self',
                       'href': reverse('pathagar.books.views.root')})
-
-    links.append({'title': 'Home', 'type': 'application/atom+xml',
+        links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
+                      'rel': 'search',
+                      'href': 'http://example.com/opds/search.php?q={searchTerms}' }) # TODO: Search feature is not yet finished.
+    
+    links.append({'title': 'Home', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                   'rel': 'start',
                   'href': reverse('pathagar.books.views.root')})
-
-    feed = AtomFeed(title = 'Pathagar Bookserver OPDS feed', \
-        atom_id = 'pathagar:full-catalog', subtitle = \
-        'OPDS catalog for the Pathagar book server', \
-        extra_attrs = ATTRS, hide_generator=True, links=links)
-
-
+    
+    icon = None;
+    if is_root:
+        icon = '/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png'
+    
+    feed = AtomFeed(title = FEED_TITLE,
+                    atom_id = 'pathagar:full-catalog',
+                    subtitle = FEED_DESCRIPTION,
+                    extra_attrs = ATTRS,
+                    hide_generator=True,
+                    links=links,
+                    icon=icon)
+    
     for subsec in subsections:
         feed.add_item(subsec['id'], subsec['title'],
                       subsec['updated'], links=subsec['links'])
@@ -89,25 +101,31 @@ def generate_nav_catalog(subsections, is_root=False):
 def generate_root_catalog():
     subsections = [
         {'id': 'latest', 'title': 'Latest', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('latest_feed')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('latest_feed')},
+                    {'rel': 'alternate', 'href': reverse('latest_feed')}]},
         {'id': 'by-title', 'title': 'By Title', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('by_title_feed')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_title_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_title_feed')}]},
         {'id': 'by-author', 'title': 'By Author', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('by_author_feed')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
+                    'href': reverse('by_author_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_author_feed')}]},
         {'id': 'by-popularity', 'title': 'Most downloaded', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('most_downloaded_feed')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('most_downloaded_feed')},
+                    {'rel': 'alternate', 'href': reverse('most_downloaded_feed')}]},
         {'id': 'tags', 'title': 'Tags', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('tags_feed')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
+                    'href': reverse('tags_feed')},
+                    {'rel': 'alternate', 'href': reverse('tags_feed')}]},
         {'id': 'tag-groups', 'title': 'Tag groups', 'updated': datetime.datetime.now(),
-         'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                    'href': reverse('tags_listgroups')}]},
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
+                    'href': reverse('tags_listgroups')},
+                    {'rel': 'alternate', 'href': reverse('tags_listgroups')}]},
     ]
-    return generate_nav_catalog(subsections)
+    return generate_nav_catalog(subsections, is_root=True )
 
 def generate_tags_catalog(tags):
     def convert_tag(tag):
@@ -138,49 +156,95 @@ def generate_catalog(request, page_obj):
         previous_page = page_obj.previous_page_number()
         links.append({'title': 'Previous results', 'type': 'application/atom+xml',
                       'rel': 'previous',
-                      'href': page_qstring(request, previous_page)})
+                      'href': request.path + page_qstring(request, previous_page)})
     
     if page_obj.has_next():
         next_page = page_obj.next_page_number()
         links.append({'title': 'Next results', 'type': 'application/atom+xml',
                       'rel': 'next',
-                      'href': page_qstring(request, next_page)})
+                      'href': request.path + page_qstring(request, next_page)})
     
-    feed = AtomFeed(title = 'Pathagar Bookserver OPDS feed', \
-        atom_id = 'pathagar:full-catalog', subtitle = \
-        'OPDS catalog for the Pathagar book server', \
-        extra_attrs = ATTRS, hide_generator=True, links=links)
+    feed = AtomFeed(title = FEED_TITLE,
+                    atom_id = 'pathagar:full-catalog',
+                    subtitle = FEED_DESCRIPTION,
+                    extra_attrs = ATTRS, hide_generator=True, links=links)
 
+    bbcodeParser = get_parser()
     for book in page_obj.object_list:
-        if book.cover_img:
-            linklist = [{'rel': \
-                    'http://opds-spec.org/acquisition', 'href': \
-                    reverse('pathagar.books.views.download_book',
-                            kwargs=dict(book_id=book.pk)),
-                    'type': __get_mimetype(book)}, {'rel': \
-                    'http://opds-spec.org/cover', 'href': \
-                    book.cover_img.url }]
-        else:
-           linklist = [{'rel': \
-                    'http://opds-spec.org/acquisition', 'href': \
-                    reverse('pathagar.books.views.download_book',
-                            kwargs=dict(book_id=book.pk)),
-                    'type': __get_mimetype(book)}]
+        
+        linklist = [
+                        {
+                            'rel': 'http://opds-spec.org/acquisition',
+                            'href': reverse('pathagar.books.views.download_book',
+                                            kwargs=dict(book_id=book.pk, filename=book.a_title+".epub" )),
+                            'type': 'application/epub+zip'
+                        },
+                        {
+                            'rel': 'http://opds-spec.org/acquisition',
+                            'href': reverse('pathagar.books.views.download_book',
+                                            kwargs=dict(book_id=book.pk, filename=book.a_title+".mobi" )),
+                            'type': 'application/x-mobipocket-ebook'
+                        },
+                        {
+                            'href': book.getOnlineViewingUrl(),
+                        },
+                   ]
+        
+        if book.getCoverImageUrl():
+            # We are stripping everything past the question mark. guess_type fails in some cases otherwise.
+            mimetype, encoding = mimetypes.guess_type( book.getCoverImageUrl().split('?')[0], strict=False )
+            if mimetype is None:
+                mimetype = 'image/*'
+            linklist.append(
+                {
+                    'rel': 'http://opds-spec.org/image',
+                    'type': mimetype,
+                    'href': book.getCoverImageUrl()
+                },
+            )
+        
+        if book.getThumbnailUrl():
+            # We are stripping everything past the question mark. guess_type fails in some cases otherwise.
+            mimetype, encoding = mimetypes.guess_type( book.getThumbnailUrl().split('?')[0], strict=False )
+            if mimetype is None:
+                mimetype = 'image/*'
+            linklist.append(
+                {
+                    'rel': 'http://opds-spec.org/image/thumbnail',
+                    'type': mimetype,
+                    'href': book.getThumbnailUrl()
+                },
+            )
+        
+        authors = []
+        for author in book.a_authors.all():
+            authors.append(
+                {
+                    'name':author.name,
+                    'uri':author.getLink(),
+                })
+        
+        categories = []
+        for category in book.a_categories.all():
+            categories.append(category.category)
         
         add_kwargs = {
-            'content': book.a_summary,
+            'summary': book.a_summary,
+            'content': ({'type':'xhtml'}, bbcodeParser.render(book.a_content)),
             'links': linklist,
-            'authors': [{'name' : book.a_author}],
+            'authors': authors,
+            'categories': categories,
             'dc_publisher': book.dc_publisher,
             'dc_issued': book.dc_issued,
             'dc_identifier': book.dc_identifier,
         }
-           
+        
         if book.dc_language is not None:
             add_kwargs['dc_language'] = book.dc_language.code
 
-        feed.add_item(book.a_id, book.a_title, book.a_updated, **add_kwargs)
+        feed.add_item( book.getUUID(), book.a_title, book.a_updated, **add_kwargs)
 
     s = StringIO()
     feed.write(s, 'UTF-8')
     return s.getvalue()
+

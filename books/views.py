@@ -98,16 +98,18 @@ def book_detail(request, book_id):
         template_object_name = 'book',
     )
 
-def download_book(request, book_id):
+# Example:
+# /book/25377/download/epub/filename_foo.epub
+# The filename is ignored.
+def download_book(request, book_id, filename):
     book = get_object_or_404(Book, pk=book_id)
-    filename = os.path.join(settings.MEDIA_ROOT, book.book_file.name)
 
     # TODO, currently the downloads counter is incremented when the
     # download is requested, without knowing if the file sending was
     # successfull:
     book.downloads += 1
     book.save()
-    return sendfile(request, filename, attachment=True)
+    return redirect( book.getDownloadUrl(filename) )
 
 def tags(request, qtype=None, group_slug=None):
     context = {'list_by': 'by-tag'}

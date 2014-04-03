@@ -1,30 +1,133 @@
-[{
-    "pk": 1,
-    "model": "books.language",
-    "fields": {
-        "code": "en",
-        "label": "English"
-    }
-},
-{
-    "pk": 2,
-    "model": "books.language",
+[
+    {
+        "pk": 1,
+        "model": "books.language",
         "fields": {
-        "code": "es",
-        "label": "Spanish"
+            "code": "en",
+            "label": "English"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "books.language",
+            "fields": {
+            "code": "es",
+            "label": "Spanish"
+        }
+    },
+    
+    {
+        "pk": 1,
+        "model": "books.Category",
+        "fields": {
+          "category": "Anthro"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "books.Category",
+        "fields": {
+          "category": "Human"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "books.Category",
+        "fields": {
+          "category": "Crossover"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "books.Category",
+        "fields": {
+          "category": "Comedy"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "books.Category",
+        "fields": {
+          "category": "Random"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "books.Category",
+        "fields": {
+          "category": "Alternate Universe"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "books.Category",
+        "fields": {
+          "category": "Romance"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "books.Category",
+        "fields": {
+          "category": "Tragedy"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "books.Category",
+        "fields": {
+          "category": "Sad"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "books.Category",
+        "fields": {
+          "category": "Adventure"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "books.Category",
+        "fields": {
+          "category": "Dark"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "books.Category",
+        "fields": {
+          "category": "Slice of Life"
+        }
+    },
+    
+    
+    {
+        "pk": 1,
+        "model": "books.status",
+        "fields": {
+          "status": "Complete"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "books.status",
+        "fields": {
+          "status": "Incomplete"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "books.status",
+        "fields": {
+          "status": "Cancelled"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "books.status",
+        "fields": {
+          "status": "On Hiatus"
+        }
     }
-},
-{
-    "pk": 1,
-    "model": "books.status",
-    "fields": {
-      "status": "Published"
-    }
-},
-{
-    "pk": 2,
-    "model": "books.status",
-    "fields": {
-      "status": "Draft"
-    }
-}]
+]

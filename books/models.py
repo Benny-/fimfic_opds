@@ -17,20 +17,13 @@
 
 from django.db import models
 
-from hashlib import sha256
-
 from tagging.fields import TagField #OLD
 
 from taggit.managers import TaggableManager #NEW
 
-from uuidfield import UUIDField
 from langlist import langs
-
-def sha256_sum(_file): # used to generate sha256 sum of book files
-    s = sha256()
-    for chunk in _file:
-        s.update(chunk)
-    return s.hexdigest()
+import urllib
+import os
 
 class Language(models.Model):
     label = models.CharField('language name', max_length=50, blank=False, unique=True)
@@ -66,6 +59,14 @@ class TagGroup(models.Model):
     def __unicode__(self):
         return self.name
 
+class Category(models.Model):
+    category = models.CharField(max_length=200, blank=False)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __unicode__(self):
+        return self.category
 
 class Status(models.Model):
     status = models.CharField(max_length=200, blank=False)
@@ -76,6 +77,18 @@ class Status(models.Model):
     def __unicode__(self):
         return self.status
 
+class Author(models.Model):
+    id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
+    name = models.CharField(max_length=200, blank=False)
+    
+    def getLink(self):
+        return 'https://www.fimfiction.net/user/' + self.name.replace(' ', '+')
+    
+    class Meta:
+        verbose_name_plural = "Authors"
+    
+    def __unicode__(self):
+        return self.name
 
 class Book(models.Model):
     """
@@ -86,30 +99,54 @@ class Book(models.Model):
     book can be listed in OPDS catalogs.
 
     """
-    book_file = models.FileField(upload_to='books')
-    file_sha256sum = models.CharField(max_length=64, unique=True)
-    mimetype = models.CharField(max_length=200, null=True)
     time_added = models.DateTimeField(auto_now_add=True)
     tags = TaggableManager(blank=True)
     downloads = models.IntegerField(default=0)
-    a_id = UUIDField('atom:id')
+    id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
+    words = models.IntegerField(blank=True, null=True)
+    views = models.IntegerField(blank=True, null=True)
+    likes = models.IntegerField(blank=True, null=True)
+    dislikes = models.IntegerField(blank=True, null=True)
+    a_thumbnail = models.CharField(max_length=16, blank=True, null=True) # A small thumbnail image. Image filename.
+    a_cover = models.CharField(max_length=16, blank=True, null=True)     # A bigger image. most of the time the same as the thumbnail but bigger. Image filename.
     a_status = models.ForeignKey(Status, blank=False, null=False)
     a_title = models.CharField('atom:title', max_length=200)
-    a_author = models.CharField('atom:author', max_length=200)
+    a_authors = models.ManyToManyField(Author) # fimfic does not support multiple authors for a single story. But we support it anyway in case it changes.
     a_updated = models.DateTimeField('atom:updated', auto_now=True)
-    a_summary = models.TextField('atom:summary', blank=True)
-    a_category = models.CharField('atom:category', max_length=200, blank=True)
+    a_summary = models.TextField('atom:summary', blank=True) # Short description
+    a_content = models.TextField('atom:content', blank=True) # Long description
+    a_categories = models.ManyToManyField(Category)
     a_rights = models.CharField('atom:rights', max_length=200, blank=True)
     dc_language = models.ForeignKey(Language, blank=True, null=True)
     dc_publisher = models.CharField('dc:publisher', max_length=200, blank=True)
     dc_issued = models.CharField('dc:issued', max_length=100, blank=True)
     dc_identifier = models.CharField('dc:identifier', max_length=50, \
-    help_text='Use ISBN for this', blank=True)
-    cover_img = models.FileField(blank=True, upload_to='covers')
-
+        help_text='Use ISBN for this', blank=True)
+    
+    def getUUID(self):
+        """
+        Convert the numeric ID to a UUID-like ID
+        """
+        return u"urn:uuid:32cedbbd-0000-0000-0000-" + str(self.id).zfill(13)
+    
+    def getThumbnailUrl(self):
+        if self.a_thumbnail:
+            return 'https://www.fimfiction-static.net/images/story_images/' + self.a_thumbnail
+        return None
+    
+    def getCoverImageUrl(self):
+        if self.a_cover:
+            return 'https://www.fimfiction-static.net/images/story_images/' + self.a_cover
+        return None
+    
+    def getOnlineViewingUrl(self):
+        return u'https://www.fimfiction.net/story/' + str(self.id) + "/" + self.a_title
+    
+    def getDownloadUrl(self, fileName):
+        fileName, fileExtension = os.path.splitext(fileName)
+        return u'http://xn--t3k.com:4100/book/'+str(self.id)+u'/download/' + urllib.quote(self.a_title) + fileExtension
+    
     def save(self, *args, **kwargs):
-        if not self.file_sha256sum:
-            self.file_sha256sum = sha256_sum(self.book_file)
         super(Book, self).save(*args, **kwargs)
 
     class Meta:
@@ -122,3 +159,4 @@ class Book(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('pathagar.books.views.book_detail', [self.pk])
+

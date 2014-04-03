@@ -13,7 +13,7 @@
 <div id="content">
 
 <h1 class="alt">{{ book.a_title }}</h1>
-<h2>by <span class="alt">{{ book.a_author }}</span></h2>
+<h2>by <span class="alt">{% for author in book.a_authors.all %}{{ author }}{% endfor %}</span></h2>
 <hr class="space">
 {% if user.is_authenticated %}
 <div class="span-3">
@@ -60,18 +60,25 @@
 <p>
 {{ book.a_summary }}
 </p>
+<hr class="space">
+<p>
+{{ book.a_content }}
+</p>
 </div>
 <hr>
 </div>
 
 <div class="span-6 last" id="sidebar">
-{% if  book.cover_img %}
-<img src="{{ book.cover_img.url }}" alt="Cover" width=150px/>
+{% if  book.a_cover %}
+<img src="{{ book.getCoverImageUrl }}" alt="Cover" width=400px/>
+{% elif book.a_thumbnail %}
+<img src="{{ book.getThumbnailUrl }}" alt="Cover" width=150px/>
 {% else %}
 <img src="{{ STATIC_URL }}images/generic_cover.png" alt="Cover" width=150px/>
 {% endif %}
 <hr class="space">
-<a href="{% url pathagar.books.views.download_book book.pk %}">Download book</a>
+<a href="{% url pathagar.books.views.download_book book.pk book.a_title|add:".epub" %}">Download epub</a>
+<a href="{{ book.getOnlineViewingUrl }}">View on fimfic</a>
 </div>
 
 

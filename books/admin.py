@@ -21,9 +21,8 @@ from django.contrib import admin
 
 class BookAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None, {'fields': ['book_file']}),
-        ('Basic Information', {'fields': ['a_title', 'a_author', 'a_status', 'tags']}),
-        ('Extended information', {'fields': ['a_summary', 'a_category', 'a_rights', 'dc_language', 'dc_publisher', 'dc_issued', 'dc_identifier', 'cover_img'], 'classes': ['collapse']}),
+        ('Basic Information', {'fields': ['a_title', 'a_authors', 'a_status', 'tags']}),
+        ('Extended information', {'fields': ['a_summary', 'a_categories', 'a_rights', 'dc_language', 'dc_publisher', 'dc_issued', 'dc_identifier'], 'classes': ['collapse']}),
     ]
 
 
