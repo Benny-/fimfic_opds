@@ -28,6 +28,7 @@ import csv
 import json
 from optparse import make_option
 import urllib
+from datetime import date
 
 from books.models import Status, Author, Category, Book
 import settings
@@ -146,12 +147,18 @@ class Command(BaseCommand):
                     book_dict['likes'] = ffstory['likes']
                     book_dict['dislikes'] = ffstory['dislikes']
                     book_dict['words'] = ffstory['words']
+                    book_dict['a_updated'] = date.fromtimestamp(ffstory['date_modified'])
+                    if 'chapters' in ffstory:
+                        for chapter in ffstory['chapters']:
+                            chapter_modified_time = date.fromtimestamp(chapter['date_modified']);
+                            if(book_dict['a_updated'] < chapter_modified_time):
+                                book_dict['a_updated'] = chapter_modified_time
                     book_dict['a_title'] = unescape(ffstory['title'])
                     book_dict['a_status'] = ffstory['status']
                     book_dict['a_summary'] = unescape(ffstory['short_description'])
                     book_dict['a_content'] = unescape(ffstory['description'])
                     
-                    print( book_dict['id'], book_dict['a_title'] )
+                    print( book_dict['id'], book_dict['a_title'], book_dict['a_updated'] )
 #                    print(book_dict['a_summary'], ffstory['short_description'])
 #                    print(book_dict['a_content'], ffstory['description'])
                     

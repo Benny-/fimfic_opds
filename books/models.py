@@ -103,16 +103,19 @@ class Book(models.Model):
     tags = TaggableManager(blank=True)
     downloads = models.IntegerField(default=0)
     id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
+    updated = models.DateTimeField(auto_now=True, blank=True) # When this database record was updated. Also see a_updated
     words = models.IntegerField(blank=True, null=True)
     views = models.IntegerField(blank=True, null=True)
     likes = models.IntegerField(blank=True, null=True)
     dislikes = models.IntegerField(blank=True, null=True)
-    a_thumbnail = models.CharField(max_length=16, blank=True, null=True) # A small thumbnail image. Image filename.
-    a_cover = models.CharField(max_length=16, blank=True, null=True)     # A bigger image. most of the time the same as the thumbnail but bigger. Image filename.
+    a_thumbnail = models.CharField(max_length=16, blank=True, null=True,
+                    help_text='A small thumbnail image. Image filename.')
+    a_cover = models.CharField(max_length=16, blank=True, null=True,
+                    help_text='A bigger image. most of the time the same as the thumbnail but bigger. Image filename.')
     a_status = models.ForeignKey(Status, blank=False, null=False)
     a_title = models.CharField('atom:title', max_length=200)
     a_authors = models.ManyToManyField(Author) # fimfic does not support multiple authors for a single story. But we support it anyway in case it changes.
-    a_updated = models.DateTimeField('atom:updated', auto_now=True)
+    a_updated = models.DateTimeField('atom:updated', blank=True, null=True) # updated in the sense when the book itself was last changed or updated.
     a_summary = models.TextField('atom:summary', blank=True) # Short description
     a_content = models.TextField('atom:content', blank=True) # Long description
     a_categories = models.ManyToManyField(Category)
