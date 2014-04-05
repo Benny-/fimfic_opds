@@ -109,9 +109,9 @@ class Book(models.Model):
     likes = models.IntegerField(blank=True, null=True)
     dislikes = models.IntegerField(blank=True, null=True)
     a_thumbnail = models.CharField(max_length=16, blank=True, null=True,
-                    help_text='A small thumbnail image. Image filename.')
+                    help_text='A small thumbnail image. Image filename + extension.')
     a_cover = models.CharField(max_length=16, blank=True, null=True,
-                    help_text='A bigger image. most of the time the same as the thumbnail but bigger. Image filename.')
+                    help_text='A bigger image. most of the time the same as the thumbnail but bigger. Image filename + extension.')
     a_status = models.ForeignKey(Status, blank=False, null=False)
     a_title = models.CharField('atom:title', max_length=200)
     a_authors = models.ManyToManyField(Author) # fimfic does not support multiple authors for a single story. But we support it anyway in case it changes.
