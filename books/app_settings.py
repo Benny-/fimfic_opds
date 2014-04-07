@@ -20,7 +20,8 @@ from django.conf import settings
 # Number of books shown per page in the OPDS catalogs and in the HTML
 # pages:
 
-BOOKS_PER_PAGE = getattr(settings, 'BOOKS_PER_PAGE', 2) 
+BOOKS_PER_PAGE = getattr(settings, 'BOOKS_PER_PAGE', 10)
+AUTHORS_PER_PAGE = getattr(settings, 'AUTHORS_PER_PAGE', 500)
 
 # If True, serve static media via Django.  Note that this is not
 # recommended for production:
@@ -30,3 +31,4 @@ BOOKS_STATICS_VIA_DJANGO = getattr(settings, 'BOOKS_STATICS_VIA_DJANGO', False)
 # This needs to match the published status
 
 BOOK_PUBLISHED = getattr(settings, 'BOOK_PUBLISHED', 1)
+

@@ -91,8 +91,15 @@ def generate_nav_catalog(subsections, is_root=False):
                     icon=icon)
     
     for subsec in subsections:
-        feed.add_item(subsec['id'], subsec['title'],
-                      subsec['updated'], links=subsec['links'])
+        content = None
+        if 'content' in subsec:
+            content = subsec['content']
+        feed.add_item(  subsec['id'],
+                        subsec['title'],
+                        subsec['updated'],
+                        content=content,
+                        links=subsec['links'],
+                     )
 
     s = StringIO()
     feed.write(s, 'UTF-8')
@@ -108,10 +115,10 @@ def generate_root_catalog():
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_title_feed')},
                     {'rel': 'alternate', 'href': reverse('by_title_feed')}]},
-        {'id': 'by-author', 'title': 'By Author', 'updated': datetime.datetime.now(),
+        {'id': 'all_authors', 'title': 'By Author', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
-                    'href': reverse('by_author_feed')},
-                    {'rel': 'alternate', 'href': reverse('by_author_feed')}]},
+                    'href': reverse('all_authors')},
+                    {'rel': 'alternate', 'href': reverse('all_authors')}]},
         {'id': 'by-popularity', 'title': 'Most downloaded', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('most_downloaded_feed')},
@@ -126,6 +133,43 @@ def generate_root_catalog():
                     {'rel': 'alternate', 'href': reverse('tags_listgroups')}]},
     ]
     return generate_nav_catalog(subsections, is_root=True )
+
+def generate_authors_catalog(request, authors, page_obj):
+    
+    links = []
+    if page_obj.has_previous():
+        previous_page = page_obj.previous_page_number()
+        links.append({'title': 'Previous results', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
+                      'rel': 'previous',
+                      'href': request.path + page_qstring(request, previous_page)})
+    
+    if page_obj.has_next():
+        next_page = page_obj.next_page_number()
+        links.append({'title': 'Next results', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
+                      'rel': 'next',
+                      'href': request.path + page_qstring(request, next_page)})
+    
+    def convert_author(author):
+        return {
+                'id': author.name,
+                'title': author.name, 
+                'updated': datetime.datetime.now(),
+                'content': str(author.book_set.count()) + ' book(s)',
+                'links': [
+                            {
+                                'rel': 'subsection',
+                                'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
+                                'href': reverse('by_author', kwargs=dict(author_id=author.id) )
+                            },
+                            {
+                                'rel': 'alternate',
+                                'href': reverse('by_author', kwargs=dict(author_id=author.id) )
+                            },
+                         ]
+                }
+
+    authors_subsections = map(convert_author, page_obj.object_list)
+    return generate_nav_catalog(authors_subsections)
 
 def generate_tags_catalog(tags):
     def convert_tag(tag):

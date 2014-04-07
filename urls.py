@@ -1,6 +1,6 @@
 import os
 
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.contrib import admin
 admin.autodiscover()
 
@@ -16,35 +16,36 @@ urlpatterns = patterns('',
      {}, 'latest'),
     (r'^by-title/$', 'pathagar.books.views.by_title',
      {}, 'by_title'),
-    (r'^by-author/$', 'pathagar.books.views.by_author',
-     {}, 'by_author'),
     (r'^tags/(?P<tag>.+)/$', 'pathagar.books.views.by_tag',
      {}, 'by_tag'),
     (r'^by-popularity/$', 'pathagar.books.views.most_downloaded',
      {}, 'most_downloaded'),
 
     # Tag groups:
-    (r'^tags/groups.atom$', 'pathagar.books.views.tags_listgroups',
+    (r'^tags/groups/$', 'pathagar.books.views.tags_listgroups',
      {}, 'tags_listgroups'),
+    (r'^tags/groups.atom$', 'pathagar.books.views.tags_listgroups',
+     {}),
 
     # Book list Atom:
-    (r'^catalog.atom$', 'pathagar.books.views.root',
+    (r'^opds/$', 'pathagar.books.views.root',
      {'qtype': u'feed'}, 'root_feed'),
-    (r'^latest.atom$', 'pathagar.books.views.latest',
+    (r'^opds/latest/$', 'pathagar.books.views.latest',
      {'qtype': u'feed'}, 'latest_feed'),
-    (r'^by-title.atom$', 'pathagar.books.views.by_title',
+    (r'^opds/alphabet/$', 'pathagar.books.views.by_title',
      {'qtype': u'feed'}, 'by_title_feed'),
-    (r'^by-author.atom$', 'pathagar.books.views.by_author',
-     {'qtype': u'feed'}, 'by_author_feed'),
-    (r'^tags/(?P<tag>.+).atom$', 'pathagar.books.views.by_tag',
+    (r'^opds/tags/(?P<tag>.+)$', 'pathagar.books.views.by_tag',
      {'qtype': u'feed'}, 'by_tag_feed'),
-    (r'^by-popularity.atom$', 'pathagar.books.views.most_downloaded',
+    (r'^opds/popular/$', 'pathagar.books.views.most_downloaded',
      {'qtype': u'feed'}, 'most_downloaded_feed'),
-
+    (r'^opds/authors/$', 'pathagar.books.views.all_authors',
+     {'qtype': u'feed'}, 'all_authors'),
+    (r'^opds/author/(?P<author_id>\d+)$', 'pathagar.books.views.by_author',
+     {'qtype': u'feed'}, 'by_author'),
+    
     # Tag groups:
     (r'^tags/groups/(?P<group_slug>[-\w]+)/$', 'pathagar.books.views.tags',
      {}, 'tag_groups'),
-
     (r'^tags/groups/(?P<group_slug>[-\w]+).atom$', 'pathagar.books.views.tags',
      {'qtype': u'feed'}, 'tag_groups_feed'),
 

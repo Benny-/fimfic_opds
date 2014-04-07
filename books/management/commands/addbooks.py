@@ -158,7 +158,7 @@ class Command(BaseCommand):
                     book_dict['a_summary'] = unescape(ffstory['short_description'])
                     book_dict['a_content'] = unescape(ffstory['description'])
                     
-                    print( book_dict['id'], book_dict['a_title'], book_dict['a_updated'] )
+                    print( book_dict['id'], book_dict['a_title'] )
 #                    print(book_dict['a_summary'], ffstory['short_description'])
 #                    print(book_dict['a_content'], ffstory['description'])
                     

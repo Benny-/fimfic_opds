@@ -316,8 +316,7 @@ class AtomFeed(object):
                 handler.characters("\t\t")
                 handler.addQuickElement(u'content', text, content_dict)
         else:
-            handler.characters("\t\t")
-            handler.addQuickElement(u'content', data)
+            handler.addQuickElement(u'content', data, tabs=2)
 
 
     def write(self, outfile, encoding):

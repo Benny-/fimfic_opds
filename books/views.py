@@ -30,7 +30,7 @@ from django.views.generic.create_update import create_object, update_object, \
   delete_object
 from django.template import RequestContext, resolve_variable
 
-from app_settings import BOOKS_PER_PAGE
+from app_settings import BOOKS_PER_PAGE, AUTHORS_PER_PAGE
 from django.conf import settings
 
 # OLD ---------------
@@ -45,11 +45,12 @@ from sendfile import sendfile
 from search import simple_search, advanced_search
 from forms import BookForm, AddLanguageForm
 from langlist import langs as LANG_CHOICES
-from models import TagGroup, Book
+from models import TagGroup, Book, Author
 from popuphandler import handlePopAdd
 from opds import page_qstring
 from opds import generate_catalog
 from opds import generate_root_catalog
+from opds import generate_authors_catalog
 from opds import generate_tags_catalog
 from opds import generate_taggroups_catalog
 
@@ -200,7 +201,8 @@ def _book_list(request, queryset, qtype=None, list_by='latest', **kwargs):
         'paginator': paginator,
         'page_obj': page_obj,
         'search_title': search_title,
-        'search_author': search_author, 'list_by': list_by,
+        'search_author': search_author,
+        'list_by': list_by,
         'qstring': qstring,
     })
     return render_to_response(
@@ -209,6 +211,20 @@ def _book_list(request, queryset, qtype=None, list_by='latest', **kwargs):
         context_instance = RequestContext(request),
     )
 
+def _authors_list(request, queryset, qtype):
+    paginator = Paginator(queryset, AUTHORS_PER_PAGE)
+    page = int(request.GET.get('page', '1'))
+    
+    try:
+        page_obj = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        page_obj = paginator.page(paginator.num_pages)
+    
+    if qtype == 'feed':
+        catalog = generate_authors_catalog(request, request, page_obj)
+        return HttpResponse(catalog, mimetype='application/atom+xml')
+    raise NotImplementedError("Aw shit man. I don't have time to implement a html response.")
+    
 def home(request):
     return redirect('latest')
 
@@ -225,9 +241,13 @@ def by_title(request, qtype=None):
     queryset = Book.objects.all().order_by('a_title')
     return _book_list(request, queryset, qtype, list_by='by-title')
 
-def by_author(request, qtype=None):
-    queryset = Book.objects.all().order_by('a_author')
-    return _book_list(request, queryset, qtype, list_by='by-author')
+def all_authors(request, qtype=None):
+    queryset = Author.objects.all().order_by('name')
+    return _authors_list(request, queryset, qtype)
+
+def by_author(request, author_id=None, qtype=None):
+    queryset = Author.objects.get( id = author_id ).book_set.all();
+    return _book_list(request, queryset, qtype, list_by='by_author')
 
 def by_tag(request, tag, qtype=None):
     """ displays a book list by the tag argument """
