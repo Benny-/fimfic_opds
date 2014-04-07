@@ -244,7 +244,9 @@ class AtomFeed(object):
             if text_type == 'xhtml':
                 handler.characters("\t\t")
                 handler.startElement(element_name, {'type': text_type})
+                handler._write(u'<![CDATA[')
                 handler._write(text) # write unescaped -- it had better be well-formed XML
+                handler._write(u']]>')
                 handler.endElement(element_name)
             else:
                 handler.addQuickElement(element_name, text, {'type': text_type}, tabs=tabs)
@@ -310,7 +312,9 @@ class AtomFeed(object):
             if content_dict.get('type') == 'xhtml':
                 handler.characters("\t\t")
                 handler.startElement(u'content', content_dict)
+                handler._write(u'<![CDATA[')
                 handler._write(text) # write unescaped -- it had better be well-formed XML
+                handler._write(u']]>')
                 handler.endElement(u'content')
             else:
                 handler.characters("\t\t")
