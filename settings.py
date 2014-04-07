@@ -94,6 +94,5 @@ INSTALLED_APPS = (
     'tagging', # TODO old
     'taggit',
     'pathagar.books',
-    'precise_bbcode',
 )
 

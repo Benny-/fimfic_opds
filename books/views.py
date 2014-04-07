@@ -241,6 +241,18 @@ def by_title(request, qtype=None):
     queryset = Book.objects.all().order_by('a_title')
     return _book_list(request, queryset, qtype, list_by='by-title')
 
+def by_likes(request, qtype=None):
+    queryset = Book.objects.all().order_by('-likes')
+    return _book_list(request, queryset, qtype, list_by='by-likes')
+
+def by_dislikes(request, qtype=None):
+    queryset = Book.objects.all().order_by('-dislikes')
+    return _book_list(request, queryset, qtype, list_by='by-dislikes')
+
+def by_words(request, qtype=None):
+    queryset = Book.objects.all().order_by('-words')
+    return _book_list(request, queryset, qtype, list_by='by-words')
+
 def all_authors(request, qtype=None):
     queryset = Author.objects.all().order_by('name')
     return _authors_list(request, queryset, qtype)

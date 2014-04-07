@@ -18,7 +18,8 @@
 from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
-from precise_bbcode.parser import get_parser
+
+import bbcode
 
 from atom import AtomFeed
 import mimetypes
@@ -115,10 +116,22 @@ def generate_root_catalog():
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_title_feed')},
                     {'rel': 'alternate', 'href': reverse('by_title_feed')}]},
+        {'id': 'by-likes', 'title': 'By Likes', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_likes_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_likes_feed')}]},
+        {'id': 'by-dislikes', 'title': 'By Dislikes', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_dislikes_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_dislikes_feed')}]},
+        {'id': 'by-words', 'title': 'By word amount', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_words_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_words_feed')}]},
         {'id': 'all_authors', 'title': 'By Author', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
-                    'href': reverse('all_authors')},
-                    {'rel': 'alternate', 'href': reverse('all_authors')}]},
+                    'href': reverse('all_authors_feed')},
+                    {'rel': 'alternate', 'href': reverse('all_authors_feed')}]},
         {'id': 'by-popularity', 'title': 'Most downloaded', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('most_downloaded_feed')},
@@ -159,11 +172,11 @@ def generate_authors_catalog(request, authors, page_obj):
                             {
                                 'rel': 'subsection',
                                 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
-                                'href': reverse('by_author', kwargs=dict(author_id=author.id) )
+                                'href': reverse('by_author_feed', kwargs=dict(author_id=author.id) )
                             },
                             {
                                 'rel': 'alternate',
-                                'href': reverse('by_author', kwargs=dict(author_id=author.id) )
+                                'href': reverse('by_author_feed', kwargs=dict(author_id=author.id) )
                             },
                          ]
                 }
@@ -212,8 +225,8 @@ def generate_catalog(request, page_obj):
                     atom_id = 'pathagar:full-catalog',
                     subtitle = FEED_DESCRIPTION,
                     extra_attrs = ATTRS, hide_generator=True, links=links)
-
-    bbcodeParser = get_parser()
+    
+    bbparser = bbcode.Parser(replace_cosmetic=False)
     for book in page_obj.object_list:
         
         linklist = [
@@ -274,7 +287,7 @@ def generate_catalog(request, page_obj):
         
         add_kwargs = {
             'summary': book.a_summary,
-            'content': ({'type':'xhtml'}, bbcodeParser.render(book.a_content)),
+            'content': ( {'type':'xhtml'}, bbparser.format(book.a_content) ),
             'links': linklist,
             'authors': authors,
             'categories': categories,
