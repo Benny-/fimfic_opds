@@ -64,9 +64,8 @@ def page_qstring(request, page_number=None):
     
     return qstring
 
-def generate_nav_catalog(subsections, is_root=False):
-    links = []
-
+def generate_nav_catalog(subsections, is_root=False, links=[]):
+    
     if is_root:
         links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                       'rel': 'self',
@@ -147,6 +146,24 @@ def generate_root_catalog():
     ]
     return generate_nav_catalog(subsections, is_root=True )
 
+def generate_tags_catalog(tags):
+    def convert_tag(tag):
+        return {'id': tag.name, 'title': tag.name,  'updated': datetime.datetime.now(),
+                'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
+                           'href': reverse('by_tag_feed', kwargs=dict(tag=tag.name))}]}
+
+    tags_subsections = map(convert_tag, tags)
+    return generate_nav_catalog(tags_subsections)
+
+def generate_taggroups_catalog(tag_groups):
+    def convert_group(group):
+        return {'id': group.slug, 'title': group.name,  'updated': datetime.datetime.now(),
+                'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
+                           'href': reverse('tag_groups_feed', kwargs=dict(group_slug=group.slug))}]}
+
+    tags_subsections = map(convert_group, tag_groups)
+    return generate_nav_catalog(tags_subsections)
+
 def generate_authors_catalog(request, authors, page_obj):
     
     links = []
@@ -182,26 +199,7 @@ def generate_authors_catalog(request, authors, page_obj):
                 }
 
     authors_subsections = map(convert_author, page_obj.object_list)
-    return generate_nav_catalog(authors_subsections)
-
-def generate_tags_catalog(tags):
-    def convert_tag(tag):
-        return {'id': tag.name, 'title': tag.name,  'updated': datetime.datetime.now(),
-                'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                           'href': reverse('by_tag_feed', kwargs=dict(tag=tag.name))}]}
-
-    tags_subsections = map(convert_tag, tags)
-    return generate_nav_catalog(tags_subsections)
-
-def generate_taggroups_catalog(tag_groups):
-    def convert_group(group):
-        return {'id': group.slug, 'title': group.name,  'updated': datetime.datetime.now(),
-                'links': [{'rel': 'subsection', 'type': 'application/atom+xml', \
-                           'href': reverse('tag_groups_feed', kwargs=dict(group_slug=group.slug))}]}
-
-    tags_subsections = map(convert_group, tag_groups)
-    return generate_nav_catalog(tags_subsections)
-
+    return generate_nav_catalog(authors_subsections, links=links)
 
 def generate_catalog(request, page_obj):
     links = []
