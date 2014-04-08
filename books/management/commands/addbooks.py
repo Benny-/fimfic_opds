@@ -144,6 +144,7 @@ class Command(BaseCommand):
                     book_dict['id'] = ffstory['id']
                     book_dict['words'] = ffstory['words']
                     book_dict['views'] = ffstory['views']
+                    book_dict['comments'] = ffstory['comments']
                     book_dict['likes'] = ffstory['likes']
                     book_dict['dislikes'] = ffstory['dislikes']
                     book_dict['words'] = ffstory['words']

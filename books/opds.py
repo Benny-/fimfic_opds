@@ -33,6 +33,7 @@ ATTRS[u'xmlns:dc'] = u'http://purl.org/dc/elements/1.1/'
 ATTRS[u'xmlns:opensearch'] = 'http://a9.com/-/spec/opensearch/1.1/'
 
 FEED_TITLE = 'My Little Pony'
+FEED_ICON_LOCATION = '/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png'
 FEED_DESCRIPTION = 'Ebooks from fimfiction.net'
 
 def __get_mimetype(item):
@@ -80,7 +81,7 @@ def generate_nav_catalog(subsections, is_root=False, links=[]):
     
     icon = None;
     if is_root:
-        icon = '/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png'
+        icon = FEED_ICON_LOCATION
     
     feed = AtomFeed(title = FEED_TITLE,
                     atom_id = 'pathagar:full-catalog',
@@ -123,10 +124,18 @@ def generate_root_catalog():
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_dislikes_feed')},
                     {'rel': 'alternate', 'href': reverse('by_dislikes_feed')}]},
-        {'id': 'by-words', 'title': 'By word amount', 'updated': datetime.datetime.now(),
+        {'id': 'by-words', 'title': 'By word count', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_words_feed')},
                     {'rel': 'alternate', 'href': reverse('by_words_feed')}]},
+        {'id': 'by-comments', 'title': 'By comments count', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_comments_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_comments_feed')}]},
+        {'id': 'by-views', 'title': 'By view count', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_views_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_views_feed')}]},
         {'id': 'all_authors', 'title': 'By Author', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
                     'href': reverse('all_authors_feed')},

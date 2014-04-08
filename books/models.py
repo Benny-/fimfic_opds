@@ -106,6 +106,7 @@ class Book(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True) # When this database record was updated. Also see a_updated
     words = models.IntegerField(blank=True, null=True)
     views = models.IntegerField(blank=True, null=True)
+    comments = models.IntegerField(blank=True, null=True)
     likes = models.IntegerField(blank=True, null=True)
     dislikes = models.IntegerField(blank=True, null=True)
     a_thumbnail = models.CharField(max_length=16, blank=True, null=True,
