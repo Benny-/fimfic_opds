@@ -294,7 +294,9 @@ def generate_catalog(request, page_obj):
         
         add_kwargs = {
             'summary': book.a_summary,
-            'content': ( {'type':'xhtml'}, bbparser.format(book.a_content) ),
+            # The Unicode concatenation forces the output of bbparser to Unicode.
+            # bbparser outputs a string instead of Unicode if the input is a empty Unicode/string object
+            'content': ( {'type':'xhtml'}, u"" + bbparser.format(book.a_content) ),
             'links': linklist,
             'authors': authors,
             'categories': categories,
