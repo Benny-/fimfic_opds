@@ -65,7 +65,10 @@ def page_qstring(request, page_number=None):
     
     return qstring
 
-def generate_nav_catalog(subsections, is_root=False, links=[]):
+def generate_nav_catalog(subsections, is_root=False, links=None):
+    
+    if links is None:
+        links = []
     
     if is_root:
         links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
