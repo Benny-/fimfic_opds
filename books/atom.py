@@ -283,9 +283,9 @@ class AtomFeed(object):
         if data.get('id'):
             handler.addQuickElement(u'id', data['id'])
         if data.get('title'):
-            self.write_text_construct(handler, u'title', data['title'])
+            self.write_text_construct(handler, u'title', data['title'], tabs=1)
         if data.get('subtitle'):
-            self.write_text_construct(handler, u'subtitle', data['subtitle'])
+            self.write_text_construct(handler, u'subtitle', data['subtitle'], tabs=1)
         if data.get('icon'):
             handler.addQuickElement(u'icon', data['icon'])
         if data.get('logo'):
@@ -301,7 +301,7 @@ class AtomFeed(object):
         for contributor in data.get('contributors', []):
             self.write_person_construct(handler, u'contributor', contributor)
         if data.get('rights'):
-            self.write_text_construct(handler, u'rights', data['rights'])
+            self.write_text_construct(handler, u'rights', data['rights'], tabs=1)
         handler.endElement(u'source')
         handler.characters("\n")
 
@@ -333,9 +333,9 @@ class AtomFeed(object):
         handler.startElement(u'feed', feed_attrs)
         handler.characters("\n")
         handler.addQuickElement(u'id', self.feed['id'])
-        self.write_text_construct(handler, u'title', self.feed['title'])
+        self.write_text_construct(handler, u'title', self.feed['title'], tabs=1)
         if self.feed.get('subtitle'):
-            self.write_text_construct(handler, u'subtitle', self.feed['subtitle'])
+            self.write_text_construct(handler, u'subtitle', self.feed['subtitle'], tabs=1)
         if self.feed.get('icon'):
             handler.addQuickElement(u'icon', self.feed['icon'])
         if self.feed.get('logo'):
