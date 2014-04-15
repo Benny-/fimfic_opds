@@ -329,7 +329,6 @@ class AtomFeed(object):
         feed_attrs = {u'xmlns': self.ns}
         if self.feed.get('extra_attrs'):
             feed_attrs.update(self.feed['extra_attrs'])
-        handler.characters("\t")
         handler.startElement(u'feed', feed_attrs)
         handler.characters("\n")
         handler.addQuickElement(u'id', self.feed['id'])
