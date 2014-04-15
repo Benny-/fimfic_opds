@@ -289,16 +289,12 @@ def most_downloaded(request, qtype=None):
     queryset = Book.objects.all().order_by('-downloads')
     return _book_list(request, queryset, qtype, list_by='most-downloaded')
 
-def search(request, qtype=None):
-    queryset = Book.objects.all()
-    return _book_list(request, queryset, qtype, list_by='latest')
-
 def opensearch_description_generate(request):
     os = OpenSearch(ShortName=SEARCH_SHORTNAME, Description=SEARCH_DESCRIPTION)
     template_querystring = '?q={searchTerms}'
-    os.add_searchmethod( template=reverse('search')+template_querystring,
+    os.add_searchmethod( template=reverse('latest')+template_querystring,
                             type='text/html')
-    os.add_searchmethod( template=reverse('search_feed')+template_querystring,
+    os.add_searchmethod( template=reverse('latest_feed')+template_querystring,
                             type='application/atom+xml;profile=opds-catalog')
     os.add_image( width=16, height=16, url='/static/images/16x16.ico', type='image/x-icon' )
     return HttpResponse(os.generate_description(), mimetype='application/opensearchdescription+xml')
