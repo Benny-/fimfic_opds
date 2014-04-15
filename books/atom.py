@@ -29,7 +29,8 @@
 # THE SOFTWARE.
 #
 
-from xml.sax.saxutils import XMLGenerator
+from xml import SimplerXMLGenerator
+
 from datetime import datetime
 
 GENERATOR_TEXT = 'django-atompub'
@@ -37,23 +38,6 @@ GENERATOR_ATTR = {
     'uri': 'http://code.google.com/p/django-atompub/',
     'version': 'r33'
 }
-
-
-
-## based on django.utils.xmlutils.SimplerXMLGenerator
-class SimplerXMLGenerator(XMLGenerator):
-    def addQuickElement(self, name, contents=None, attrs=None, tabs=1):
-        "Convenience method for adding an element with no children"
-        if attrs is None: attrs = {}
-        self.characters("\t" * tabs)
-        self.startElement(name, attrs)
-        if contents is not None:
-            self.characters(contents)
-        self.endElement(name)
-        self.characters("\n")
-
-
-
 
 ## based on django.utils.feedgenerator.rfc3339_date
 def rfc3339_date(date):
