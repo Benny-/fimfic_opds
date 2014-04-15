@@ -26,15 +26,13 @@ import mimetypes
 
 import datetime
 
+from app_settings import FEED_TITLE, FEED_ICON_LOCATION, FEED_DESCRIPTION
+
 ATTRS = {}
 ATTRS[u'xmlns:dcterms'] = u'http://purl.org/dc/terms/'
 ATTRS[u'xmlns:opds'] = u'http://opds-spec.org/'
 ATTRS[u'xmlns:dc'] = u'http://purl.org/dc/elements/1.1/'
 ATTRS[u'xmlns:opensearch'] = 'http://a9.com/-/spec/opensearch/1.1/'
-
-FEED_TITLE = 'My Little Pony'
-FEED_ICON_LOCATION = '/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png'
-FEED_DESCRIPTION = 'Ebooks from fimfiction.net'
 
 def __get_mimetype(item):
     if item.mimetype is not None:
@@ -74,13 +72,13 @@ def generate_nav_catalog(subsections, is_root=False, links=None):
         links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                       'rel': 'self',
                       'href': reverse('pathagar.books.views.root')})
-        links.append({'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
+        links.append({'type': 'application/opensearchdescription+xml',
                       'rel': 'search',
-                      'href': 'http://example.com/opds/search.php?q={searchTerms}' }) # TODO: Search feature is not yet finished.
+                      'href': reverse('opensearch_description') })
     
     links.append({'title': 'Home', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                   'rel': 'start',
-                  'href': reverse('pathagar.books.views.root')})
+                  'href': reverse('root_feed')})
     
     icon = None;
     if is_root:

@@ -21,7 +21,14 @@ from django.conf import settings
 # pages:
 
 BOOKS_PER_PAGE = getattr(settings, 'BOOKS_PER_PAGE', 10)
-AUTHORS_PER_PAGE = getattr(settings, 'AUTHORS_PER_PAGE', 500)
+AUTHORS_PER_PAGE = getattr(settings, 'AUTHORS_PER_PAGE', 750)
+
+SEARCH_SHORTNAME = getattr(settings, 'SEARCH_SHORTNAME', u"My Little Pony")
+SEARCH_DESCRIPTION = getattr(settings, 'SEARCH_DESCRIPTION', u"Ebooks from fimfiction.net")
+
+FEED_TITLE = getattr(settings, 'FEED_TITLE', u'My Little Pony')
+FEED_ICON_LOCATION = getattr(settings, 'FEED_ICON_LOCATION', u'/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png')
+FEED_DESCRIPTION = getattr(settings, 'FEED_DESCRIPTION', u'Ebooks from fimfiction.net')
 
 # If True, serve static media via Django.  Note that this is not
 # recommended for production:

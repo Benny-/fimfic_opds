@@ -29,8 +29,9 @@ from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.create_update import create_object, update_object, \
   delete_object
 from django.template import RequestContext, resolve_variable
+from django.core.urlresolvers import reverse
 
-from app_settings import BOOKS_PER_PAGE, AUTHORS_PER_PAGE
+from app_settings import BOOKS_PER_PAGE, AUTHORS_PER_PAGE, SEARCH_SHORTNAME, SEARCH_DESCRIPTION
 from django.conf import settings
 
 # OLD ---------------
@@ -42,6 +43,7 @@ from taggit.models import Tag as tTag
 
 from sendfile import sendfile
 
+from opensearch import OpenSearch
 from search import simple_search, advanced_search
 from forms import BookForm, AddLanguageForm
 from langlist import langs as LANG_CHOICES
@@ -286,4 +288,18 @@ def by_tag(request, tag, qtype=None):
 def most_downloaded(request, qtype=None):
     queryset = Book.objects.all().order_by('-downloads')
     return _book_list(request, queryset, qtype, list_by='most-downloaded')
+
+def search(request, qtype=None):
+    queryset = Book.objects.all()
+    return _book_list(request, queryset, qtype, list_by='latest')
+
+def opensearch_description_generate(request):
+    os = OpenSearch(ShortName=SEARCH_SHORTNAME, Description=SEARCH_DESCRIPTION)
+    template_querystring = '?q={searchTerms}'
+    os.add_searchmethod( template=reverse('search')+template_querystring,
+                            type='text/html')
+    os.add_searchmethod( template=reverse('search_feed')+template_querystring,
+                            type='application/atom+xml;profile=opds-catalog')
+    os.add_image( width=16, height=16, url='/static/images/16x16.ico', type='image/x-icon' )
+    return HttpResponse(os.generate_description(), mimetype='application/opensearchdescription+xml')
 

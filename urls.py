@@ -22,6 +22,8 @@ urlpatterns = patterns('',
      {}, 'by_tag'),
     (r'^by-popularity/$', 'pathagar.books.views.most_downloaded',
      {}, 'most_downloaded'),
+    (r'^search/$', 'pathagar.books.views.search',
+     {}, 'search'),
 
     # Tag groups:
     (r'^tags/groups/$', 'pathagar.books.views.tags_listgroups',
@@ -54,6 +56,12 @@ urlpatterns = patterns('',
      {'qtype': u'feed'}, 'all_authors_feed'),
     (r'^opds/author/(?P<author_id>\d+)$', 'pathagar.books.views.by_author',
      {'qtype': u'feed'}, 'by_author_feed'),
+    (r'^opds/search/$', 'pathagar.books.views.search',
+     {'qtype': u'feed'}, 'search_feed'),
+    
+    # OpenSearch description
+    (r'^search.xml$', 'pathagar.books.views.opensearch_description_generate',
+     {}, 'opensearch_description'),
     
     # Tag groups:
     (r'^tags/groups/(?P<group_slug>[-\w]+)/$', 'pathagar.books.views.tags',
