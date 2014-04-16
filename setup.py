@@ -4,8 +4,8 @@ from distutils.core import setup
 
 # all the specifics are selected in setup.cfg
 setup(name='pathagar',
-    version='0.8.0',
-    url='https://github.com/PathagarBooks/pathagar',
+    version='1.0.0',
+    url='https://github.com/Benny-/pathagar',
     packages = ['pathagar',
         'pathagar.books',
         'pathagar.books.management',
