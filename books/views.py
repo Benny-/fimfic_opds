@@ -56,8 +56,7 @@ from opds import generate_authors_catalog
 from opds import generate_tags_catalog
 from opds import generate_taggroups_catalog
 
-from pathagar.books.app_settings import BOOK_PUBLISHED
-
+from pathagar.books.app_settings import BOOK_COMPLETED
 
 @login_required
 def add_language(request):
@@ -157,12 +156,10 @@ def _book_list(request, queryset, qtype=None, list_by='latest', **kwargs):
 
     context_instance = RequestContext(request)
     user = resolve_variable('user', context_instance)
-    if not user.is_authenticated():
-        queryset = queryset.filter(a_status = BOOK_PUBLISHED)
-
-    published_books_count = Book.objects.filter(a_status = BOOK_PUBLISHED).count()
-    unpublished_books_count = Book.objects.exclude(a_status = BOOK_PUBLISHED).count()
-
+    
+    completed_books_count = Book.objects.filter(a_status = BOOK_COMPLETED).count()
+    uncompleted_books_count = Book.objects.exclude(a_status = BOOK_COMPLETED).count()
+    
     # If no search options are specified, assumes search all, the
     # advanced search will be used:
     if not search_all and not search_title and not search_author:
@@ -197,8 +194,8 @@ def _book_list(request, queryset, qtype=None, list_by='latest', **kwargs):
     extra_context = dict(kwargs)
     extra_context.update({
         'book_list': page_obj.object_list,
-        'published_books': published_books_count,
-        'unpublished_books': unpublished_books_count,
+        'completed_books_count': completed_books_count,
+        'uncompleted_books_count': uncompleted_books_count,
         'q': q,
         'paginator': paginator,
         'page_obj': page_obj,
