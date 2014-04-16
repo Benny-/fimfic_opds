@@ -225,7 +225,7 @@ def _authors_list(request, queryset, qtype):
     if qtype == 'feed':
         catalog = generate_authors_catalog(request, request, page_obj)
         return HttpResponse(catalog, mimetype='application/atom+xml')
-    raise NotImplementedError("Aw shit man. I don't have time to implement a html response.")
+    raise NotImplementedError("I don't have time to implement a html response. It was never my goal.")
     
 def home(request):
     return redirect('latest')

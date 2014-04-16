@@ -52,7 +52,7 @@ files), through the command:
   
             OR
             
-    python manage.py addbooks --fimfic "directory/containing/json-files/"
+    python manage.py addbooks --dir "directory/containing/json-files/"
 
 Pathagar runs on the python web app framework Django.  It is known to work in Django 1.3 and 1.4.
 
