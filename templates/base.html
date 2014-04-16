@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset=utf-8 />
-<head>
+  <meta charset=utf-8 />
   <link rel="stylesheet" href="{{ STATIC_URL }}style/blueprint/screen.css" type="text/css" media="screen, projection">
   <link rel="stylesheet" href="{{ STATIC_URL }}style/blueprint/print.css" type="text/css" media="print">
   <link rel="stylesheet" href="{{ STATIC_URL }}style/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection">
@@ -17,6 +16,7 @@
 
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.example.min.js"></script>
+  <link rel="search" type="application/opensearchdescription+xml" href="{% url opensearch_description %}" title="Search bookserver" />
   {% block head %}{% endblock %}
 </head>
 <body>

@@ -292,10 +292,14 @@ def most_downloaded(request, qtype=None):
 def opensearch_description_generate(request):
     os = OpenSearch(ShortName=SEARCH_SHORTNAME, Description=SEARCH_DESCRIPTION)
     template_querystring = '?q={searchTerms}'
-    os.add_searchmethod( template=reverse('latest')+template_querystring,
+    protocol = 'https://' if request.is_secure() else 'http://'
+    
+    os.add_searchmethod( template=protocol+request.get_host()+reverse('latest')+template_querystring,
                             type='text/html')
-    os.add_searchmethod( template=reverse('latest_feed')+template_querystring,
+    os.add_searchmethod( template=protocol+request.get_host()+reverse('latest_feed')+template_querystring,
                             type='application/atom+xml;profile=opds-catalog')
-    os.add_image( width=16, height=16, url='/static/images/16x16.ico', type='image/x-icon' )
+    
+    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/static/images/16x16.ico', type='image/x-icon' )
+    
     return HttpResponse(os.generate_description(), mimetype='application/opensearchdescription+xml')
 
