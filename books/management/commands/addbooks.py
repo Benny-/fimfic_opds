@@ -98,46 +98,53 @@ class Command(BaseCommand):
             book_dict['likes'] = ffstory['likes']
             book_dict['dislikes'] = ffstory['dislikes']
             book_dict['words'] = ffstory['words']
+            
             book_dict['a_updated'] = date.fromtimestamp(ffstory['date_modified'])
             if 'chapters' in ffstory:
                 for chapter in ffstory['chapters']:
                     chapter_modified_time = date.fromtimestamp(chapter['date_modified']);
                     if(book_dict['a_updated'] < chapter_modified_time):
                         book_dict['a_updated'] = chapter_modified_time
+            
             book_dict['a_title'] = unescape(ffstory['title'])
             book_dict['a_status'] = ffstory['status']
             book_dict['a_summary'] = unescape(ffstory['short_description'])
             book_dict['a_content'] = unescape(ffstory['description'])
-            return book_dict
-        return None
-
-    def _handle_json(self, file_path):
-        with open(file_path) as f:
-            # Here we convert a fimfic dict into our native book format
-            ffstory = json.load(f)['story'];
-            
-            book_dict = self._json_file_to_json(file_path)
-            
-            print( book_dict['id'], book_dict['a_title'] )
-#            print(book_dict['a_summary'], ffstory['short_description'])
-#            print(book_dict['a_content'], ffstory['description'])
-            
-            if book_dict['words'] == 0:
-                raise ValueError("Ebooks containing zero words are not allowed.")
-            
-            book_dict['a_status'] = Status.objects.get( status = book_dict['a_status'] )
             
             if 'image' in ffstory:
                 book_dict['a_thumbnail'] = ffstory['image'].split('/').pop()
             if 'full_image' in ffstory:
                 book_dict['a_cover'] = ffstory['full_image'].split('/').pop()
             
-            a_categories = [];
+            author_dict = {}
+            author_dict['id'] = ffstory['author']['id']
+            author_dict['name'] = unescape(ffstory['author']['name'])
+            book_dict['author'] = author_dict
+            
+            book_dict['a_categories'] = []
             for k,v in ffstory['categories'].iteritems():
                 if v:
-                    a_categories.append( Category.objects.get( category = k ) )
+                    book_dict['a_categories'].append(k)
+        return book_dict
+
+    def _handle_json(self, file_path):
+        with open(file_path) as f:
+            book_dict = self._json_file_to_json(file_path)
             
-            author_dict = ffstory['author'];
+            print( book_dict['id'], book_dict['a_title'] )
+            
+            if book_dict['words'] == 0:
+                raise ValueError("Ebooks containing zero words are not allowed.")
+            
+            book_dict['a_status'] = Status.objects.get( status = book_dict['a_status'] )
+            
+            a_categories = [];
+            del book_dict['a_categories']
+            for category in book_dict['a_categories']:
+                a_categories.append( Category.objects.get( category = category ) )
+            
+            author_dict = book_dict['author']
+            del book_dict['author']
             try:
                 author = Author.objects.get( id = author_dict['id'] )
             except ObjectDoesNotExist as ex:
