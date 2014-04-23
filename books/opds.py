@@ -232,7 +232,11 @@ def generate_catalog(request, page_obj):
     feed = AtomFeed(title = FEED_TITLE,
                     atom_id = 'pathagar:full-catalog',
                     subtitle = FEED_DESCRIPTION,
-                    extra_attrs = ATTRS, hide_generator=True, links=links)
+                    extra_attrs = ATTRS,
+                    hide_generator=True,
+                    links=links,
+                    openSearch_totalResults=page_obj.paginator.count
+                    )
     
     bbparser = bbcode.Parser(replace_cosmetic=False)
     for book in page_obj.object_list:
