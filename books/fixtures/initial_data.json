@@ -101,31 +101,52 @@
         }
     },
     
+    {
+        "pk": 0,
+        "model": "books.Rating",
+        "fields": {
+          "description": "Everyone"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "books.Rating",
+        "fields": {
+          "description": "Teen"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "books.Rating",
+        "fields": {
+          "description": "Mature"
+        }
+    },
     
     {
         "pk": 1,
-        "model": "books.status",
+        "model": "books.Status",
         "fields": {
           "status": "Complete"
         }
     },
     {
         "pk": 2,
-        "model": "books.status",
+        "model": "books.Status",
         "fields": {
           "status": "Incomplete"
         }
     },
     {
         "pk": 3,
-        "model": "books.status",
+        "model": "books.Status",
         "fields": {
           "status": "Cancelled"
         }
     },
     {
         "pk": 4,
-        "model": "books.status",
+        "model": "books.Status",
         "fields": {
           "status": "On Hiatus"
         }

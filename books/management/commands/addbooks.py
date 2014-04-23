@@ -30,7 +30,7 @@ from optparse import make_option
 import urllib
 from datetime import date
 
-from books.models import Status, Author, Category, Book
+from books.models import Status, Rating, Author, Category, Book
 import settings
 
 import re, htmlentitydefs
@@ -98,11 +98,15 @@ class Command(BaseCommand):
             book_dict['likes'] = ffstory['likes']
             book_dict['dislikes'] = ffstory['dislikes']
             book_dict['words'] = ffstory['words']
+            book_dict['rating'] = ffstory['content_rating']
             
+            book_dict['a_published'] = date.fromtimestamp(ffstory['date_modified'])
             book_dict['a_updated'] = date.fromtimestamp(ffstory['date_modified'])
             if 'chapters' in ffstory:
                 for chapter in ffstory['chapters']:
                     chapter_modified_time = date.fromtimestamp(chapter['date_modified']);
+                    if(book_dict['a_published'] > chapter_modified_time):
+                        book_dict['a_published'] = chapter_modified_time
                     if(book_dict['a_updated'] < chapter_modified_time):
                         book_dict['a_updated'] = chapter_modified_time
             
@@ -137,11 +141,12 @@ class Command(BaseCommand):
                 raise ValueError("Ebooks containing zero words are not allowed.")
             
             book_dict['a_status'] = Status.objects.get( status = book_dict['a_status'] )
+            book_dict['rating'] = Rating.objects.get( pk = book_dict['rating'] )
             
             a_categories = [];
-            del book_dict['a_categories']
             for category in book_dict['a_categories']:
                 a_categories.append( Category.objects.get( category = category ) )
+            del book_dict['a_categories']
             
             author_dict = book_dict['author']
             del book_dict['author']
