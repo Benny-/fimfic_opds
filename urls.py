@@ -4,6 +4,7 @@ from django.conf.urls import *
 from django.contrib import admin
 admin.autodiscover()
 
+from django.conf.urls.static import static
 from django.conf import settings
 from pathagar.books.app_settings import BOOKS_STATICS_VIA_DJANGO
 
@@ -87,7 +88,7 @@ urlpatterns = patterns('',
 
     # Admin:
     (r'^admin/', include(admin.site.urls)),
-)
+) + static('/', document_root='static/')
 
 
 if BOOKS_STATICS_VIA_DJANGO:

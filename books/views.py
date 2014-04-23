@@ -296,7 +296,15 @@ def opensearch_description_generate(request):
     os.add_searchmethod( template=protocol+request.get_host()+reverse('latest_feed')+template_querystring,
                             type='application/atom+xml;profile=opds-catalog')
     
-    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/static/images/16x16.ico', type='image/x-icon' )
+    os.add_image( width=128, height=128, url=protocol+request.get_host()+'/static/images/128x128.png', type='image/png' )
+    os.add_image( width=64, height=64, url=protocol+request.get_host()+'/static/images/64x64.png', type='image/png' )
+    os.add_image( width=32, height=32, url=protocol+request.get_host()+'/static/images/32x32.png', type='image/png' )
+    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/static/images/16x16.png', type='image/png' )
+    
+    os.add_image( width=128, height=128, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=64, height=64, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=32, height=32, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
     
     return HttpResponse(os.generate_description(), mimetype='application/opensearchdescription+xml')
 
