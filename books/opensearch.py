@@ -61,7 +61,7 @@ class OpenSearch(object):
     def write_image(self, handler, image):
         url = image['url']
         del image['url']
-        handler.addQuickElement(u'Url', url, image)
+        handler.addQuickElement(u'Image', url, image)
     
     def write_searchmethod(self, handler, searchMethod):
         handler.addQuickElement(u'Url', None, searchMethod)
