@@ -16,7 +16,15 @@ import os
 # Books settings:
 
 BOOKS_PER_PAGE = 80 # Number of books shown per page in the OPDS
-                    # catalogs and in the HTML pages.
+                    # for the catalogs feeds and in the HTML pages.
+AUTHORS_PER_PAGE = 750
+
+SEARCH_SHORTNAME = u"My Little Pony"
+SEARCH_DESCRIPTION = u"Ebooks from fimfiction.net"
+
+FEED_TITLE = u'My Little Pony'
+FEED_ICON_LOCATION = u'/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png'
+FEED_DESCRIPTION = u'Ebooks from fimfiction.net'
 
 BOOKS_STATICS_VIA_DJANGO = True
 
