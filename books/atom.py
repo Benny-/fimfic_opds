@@ -234,6 +234,7 @@ class AtomFeed(object):
                 handler._write(text) # write unescaped -- it had better be well-formed XML
                 handler._write(u']]>')
                 handler.endElement(element_name)
+                handler.characters("\n")
             else:
                 handler.addQuickElement(element_name, text, {'type': text_type}, tabs=tabs)
         else:
@@ -302,6 +303,7 @@ class AtomFeed(object):
                 handler._write(text) # write unescaped -- it had better be well-formed XML
                 handler._write(u']]>')
                 handler.endElement(u'content')
+                handler.characters("\n")
             else:
                 handler.characters("\t\t")
                 handler.addQuickElement(u'content', text, content_dict)
