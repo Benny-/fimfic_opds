@@ -236,6 +236,14 @@ def latest(request, qtype=None):
     queryset = Book.objects.all()
     return _book_list(request, queryset, qtype, list_by='latest')
 
+def by_publish_latest(request, qtype=None):
+    queryset = Book.objects.all().order_by('-dc_issued')
+    return _book_list(request, queryset, qtype, list_by='by-publish-latest')
+
+def by_publish_oldest(request, qtype=None):
+    queryset = Book.objects.all().order_by('dc_issued')
+    return _book_list(request, queryset, qtype, list_by='by-publish-oldest')
+
 def by_title(request, qtype=None):
     queryset = Book.objects.all().order_by('a_title')
     return _book_list(request, queryset, qtype, list_by='by-title')

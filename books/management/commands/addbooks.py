@@ -100,13 +100,13 @@ class Command(BaseCommand):
             book_dict['words'] = ffstory['words']
             book_dict['rating'] = ffstory['content_rating']
             
-            book_dict['a_published'] = date.fromtimestamp(ffstory['date_modified'])
+            book_dict['dc_issued'] = date.fromtimestamp(ffstory['date_modified'])
             book_dict['a_updated'] = date.fromtimestamp(ffstory['date_modified'])
             if 'chapters' in ffstory:
                 for chapter in ffstory['chapters']:
                     chapter_modified_time = date.fromtimestamp(chapter['date_modified']);
-                    if(book_dict['a_published'] > chapter_modified_time):
-                        book_dict['a_published'] = chapter_modified_time
+                    if(book_dict['dc_issued'] > chapter_modified_time):
+                        book_dict['dc_issued'] = chapter_modified_time
                     if(book_dict['a_updated'] < chapter_modified_time):
                         book_dict['a_updated'] = chapter_modified_time
             

@@ -125,15 +125,15 @@ class Book(models.Model):
     a_status = models.ForeignKey(Status, blank=False, null=False)
     a_title = models.CharField('atom:title', max_length=200)
     a_authors = models.ManyToManyField(Author) # fimfic does not support multiple authors for a single story. But we support it anyway in case it changes.
-    a_published = models.DateTimeField()
-    a_updated = models.DateTimeField('atom:updated', blank=True, null=True) # updated in the sense when the book itself was last changed or updated.
+    a_published = models.DateTimeField(auto_now_add=True, blank=True) # Published on this specific book server. Also see dc_issued
+    a_updated = models.DateTimeField('atom:updated', blank=True, null=True) # updated in the sense when the book itself (or its description) was last changed or updated. This date comes from fimfiction.net
     a_summary = models.TextField('atom:summary', blank=True) # Short description
     a_content = models.TextField('atom:content', blank=True) # Long description
     a_categories = models.ManyToManyField(Category)
     a_rights = models.CharField('atom:rights', max_length=200, blank=True)
     dc_language = models.ForeignKey(Language, blank=True, null=True)
     dc_publisher = models.CharField('dc:publisher', max_length=200, blank=True)
-    dc_issued = models.CharField('dc:issued', max_length=100, blank=True)
+    dc_issued = models.DateTimeField() # The first time the ebook apear in public
     dc_identifier = models.CharField('dc:identifier', max_length=50, \
         help_text='Use ISBN for this', blank=True)
     

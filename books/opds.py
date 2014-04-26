@@ -109,46 +109,66 @@ def generate_nav_catalog(subsections, is_root=False, links=None):
 
 def generate_root_catalog():
     subsections = [
-        {'id': 'latest', 'title': 'Latest', 'updated': datetime.datetime.now(),
+        {'id': 'latest', 'title': 'Latest added', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('latest_feed')},
                     {'rel': 'alternate', 'href': reverse('latest_feed')}]},
+                    
+        {'id': 'latest', 'title': 'By publish date', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_publish_latest_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_publish_latest_feed')}]},
+                    
+        {'id': 'latest', 'title': 'By oldest publish date', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('by_publish_oldest_feed')},
+                    {'rel': 'alternate', 'href': reverse('by_publish_oldest_feed')}]},
+                    
         {'id': 'by-title', 'title': 'By Title', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_title_feed')},
                     {'rel': 'alternate', 'href': reverse('by_title_feed')}]},
+                    
         {'id': 'by-likes', 'title': 'By Likes', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_likes_feed')},
                     {'rel': 'alternate', 'href': reverse('by_likes_feed')}]},
+                    
         {'id': 'by-dislikes', 'title': 'By Dislikes', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_dislikes_feed')},
                     {'rel': 'alternate', 'href': reverse('by_dislikes_feed')}]},
+                    
         {'id': 'by-words', 'title': 'By word count', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_words_feed')},
                     {'rel': 'alternate', 'href': reverse('by_words_feed')}]},
+                    
         {'id': 'by-comments', 'title': 'By comments count', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_comments_feed')},
                     {'rel': 'alternate', 'href': reverse('by_comments_feed')}]},
+                    
         {'id': 'by-views', 'title': 'By view count', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_views_feed')},
                     {'rel': 'alternate', 'href': reverse('by_views_feed')}]},
+                    
         {'id': 'all_authors', 'title': 'By Author', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
                     'href': reverse('all_authors_feed')},
                     {'rel': 'alternate', 'href': reverse('all_authors_feed')}]},
+                    
         {'id': 'by-popularity', 'title': 'Most downloaded', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('most_downloaded_feed')},
                     {'rel': 'alternate', 'href': reverse('most_downloaded_feed')}]},
+                    
         {'id': 'tags', 'title': 'Tags', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
                     'href': reverse('tags_feed')},
                     {'rel': 'alternate', 'href': reverse('tags_feed')}]},
+                    
         {'id': 'tag-groups', 'title': 'Tag groups', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
                     'href': reverse('tags_listgroups')},
@@ -306,7 +326,7 @@ def generate_catalog(request, page_obj):
             'authors': authors,
             'categories': categories,
             'dc_publisher': book.dc_publisher,
-            'dc_issued': book.dc_issued,
+            'dc_issued': str(book.dc_issued),
             'dc_identifier': book.dc_identifier,
         }
         
