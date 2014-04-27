@@ -228,11 +228,9 @@ class AtomFeed(object):
         if isinstance(data, tuple):
             text_type, text = data
             if text_type == 'xhtml':
-                handler.characters("\t\t")
+                handler.characters("\t" * tabs)
                 handler.startElement(element_name, {'type': text_type})
-                handler._write(u'<![CDATA[')
                 handler._write(text) # write unescaped -- it had better be well-formed XML
-                handler._write(u']]>')
                 handler.endElement(element_name)
                 handler.characters("\n")
             else:
@@ -293,22 +291,19 @@ class AtomFeed(object):
         handler.characters("\n")
 
 
-    def write_content(self, handler, data):
+    def write_content(self, handler, data, tabs=2):
         if isinstance(data, tuple):
             content_dict, text = data
             if content_dict.get('type') == 'xhtml':
-                handler.characters("\t\t")
+                handler.characters("\t" * tabs)
                 handler.startElement(u'content', content_dict)
-                handler._write(u'<![CDATA[')
                 handler._write(text) # write unescaped -- it had better be well-formed XML
-                handler._write(u']]>')
                 handler.endElement(u'content')
                 handler.characters("\n")
             else:
-                handler.characters("\t\t")
-                handler.addQuickElement(u'content', text, content_dict)
+                handler.addQuickElement(u'content', text, content_dict, tabs=tabs)
         else:
-            handler.addQuickElement(u'content', data, tabs=2)
+            handler.addQuickElement(u'content', data, tabs=tabs)
 
 
     def write(self, outfile, encoding):
