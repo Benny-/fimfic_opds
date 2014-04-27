@@ -10,25 +10,52 @@ from pathagar.books.app_settings import BOOKS_STATICS_VIA_DJANGO
 
 urlpatterns = patterns('',
 
-    # Book list:
-    (r'^$', 'pathagar.books.views.home',
-     {}, 'home'),
-    (r'^latest/$', 'pathagar.books.views.latest',
-     {}, 'latest'),
-    (r'^by-title/$', 'pathagar.books.views.by_title',
-     {}, 'by_title'),
-    (r'^authors/$', 'pathagar.books.views.all_authors',
-     {}, 'all_authors'),
-    (r'^tags/(?P<tag>.+)/$', 'pathagar.books.views.by_tag',
-     {}, 'by_tag'),
-    (r'^by-popularity/$', 'pathagar.books.views.most_downloaded',
-     {}, 'most_downloaded'),
-
     # Tag groups:
     (r'^tags/groups/$', 'pathagar.books.views.tags_listgroups',
      {}, 'tags_listgroups'),
-    (r'^tags/groups.atom$', 'pathagar.books.views.tags_listgroups',
-     {}),
+    (r'^opds/tags/groups/$', 'pathagar.books.views.tags_listgroups',
+     {'qtype': u'feed'}, 'tags_listgroups_feed'),
+
+    # Tag groups:
+    (r'^tags/groups/(?P<group_slug>[-\w]+)/$', 'pathagar.books.views.tags',
+     {}, 'tag_groups'),
+    (r'^opds/tags/groups/(?P<group_slug>[-\w]+)$', 'pathagar.books.views.tags',
+     {'qtype': u'feed'}, 'tag_groups_feed'),
+
+    # Book list:
+    (r'^$', 'pathagar.books.views.home',
+     {}, 'home'),
+    (r'^latest/updated$', 'pathagar.books.views.updated',
+     {}, 'updated'),
+    (r'^latest/added$', 'pathagar.books.views.latest',
+     {}, 'latest'),
+    (r'^latest/updated_fimfic$', 'pathagar.books.views.by_updated_fimfic',
+     {}, 'updated_fimfic'),
+    (r'^latest/published/newest$', 'pathagar.books.views.by_publish_latest',
+     {}, 'by_publish_latest'),
+    (r'^oldest/published/$', 'pathagar.books.views.by_publish_oldest',
+     {}, 'by_publish_oldest'),
+    (r'^alphabet/$', 'pathagar.books.views.by_title',
+     {}, 'by_title'),
+    (r'^likes/$', 'pathagar.books.views.by_likes',
+     {}, 'by_likes'),
+    (r'^dislikes/$', 'pathagar.books.views.by_dislikes',
+     {}, 'by_dislikes'),
+    (r'^words/$', 'pathagar.books.views.by_words',
+     {}, 'by_words'),
+    (r'^tags/(?P<tag>.+)$', 'pathagar.books.views.by_tag',
+     {}, 'by_tag'),
+    (r'^popular/$', 'pathagar.books.views.most_downloaded',
+     {}, 'most_downloaded'),
+    (r'^comments/$', 'pathagar.books.views.by_comments',
+     {}, 'by_comments'),
+    (r'^views/$', 'pathagar.books.views.by_views',
+     {}, 'by_views'),
+    (r'^author/(?P<author_id>\d+)$', 'pathagar.books.views.by_author',
+     {}, 'by_author'),
+    # Author list:
+    (r'^authors/$', 'pathagar.books.views.all_authors',
+     {}, 'all_authors'),
 
     # Book list Atom:
     (r'^opds/$', 'pathagar.books.views.root',
@@ -59,24 +86,19 @@ urlpatterns = patterns('',
      {'qtype': u'feed'}, 'by_comments_feed'),
     (r'^opds/views/$', 'pathagar.books.views.by_views',
      {'qtype': u'feed'}, 'by_views_feed'),
-    (r'^opds/authors/$', 'pathagar.books.views.all_authors',
-     {'qtype': u'feed'}, 'all_authors_feed'),
     (r'^opds/author/(?P<author_id>\d+)$', 'pathagar.books.views.by_author',
      {'qtype': u'feed'}, 'by_author_feed'),
+    # Author list atom:
+    (r'^opds/authors/$', 'pathagar.books.views.all_authors',
+     {'qtype': u'feed'}, 'all_authors_feed'),
     
     # OpenSearch description
     (r'^search.xml$', 'pathagar.books.views.opensearch_description_generate',
      {}, 'opensearch_description'),
-    
-    # Tag groups:
-    (r'^tags/groups/(?P<group_slug>[-\w]+)/$', 'pathagar.books.views.tags',
-     {}, 'tag_groups'),
-    (r'^tags/groups/(?P<group_slug>[-\w]+).atom$', 'pathagar.books.views.tags',
-     {'qtype': u'feed'}, 'tag_groups_feed'),
 
     # Tag list:
     (r'^tags/$', 'pathagar.books.views.tags', {}, 'tags'),
-    (r'^tags.atom$', 'pathagar.books.views.tags',
+    (r'^opds/tags/$', 'pathagar.books.views.tags',
      {'qtype': u'feed'}, 'tags_feed'),
 
 

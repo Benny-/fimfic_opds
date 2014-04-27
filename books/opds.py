@@ -182,8 +182,8 @@ def generate_root_catalog():
                     
         {'id': 'tag-groups', 'title': 'Tag groups', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation', \
-                    'href': reverse('tags_listgroups')},
-                    {'rel': 'alternate', 'href': reverse('tags_listgroups')}]},
+                    'href': reverse('tags_listgroups_feed')},
+                    {'rel': 'alternate', 'href': reverse('tags_listgroups_feed')}]},
     ]
     return generate_nav_catalog(subsections, is_root=True )
 

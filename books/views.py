@@ -138,7 +138,7 @@ def tags(request, qtype=None, group_slug=None):
         context_instance = RequestContext(request),
     )
 
-def tags_listgroups(request):
+def tags_listgroups(request, qtype=None):
     tag_groups = TagGroup.objects.all()
     catalog = generate_taggroups_catalog(tag_groups)
     return HttpResponse(catalog, mimetype='application/atom+xml')
