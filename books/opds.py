@@ -19,7 +19,7 @@ from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
 
-import bbcode
+import fimfic_bbcode
 
 from atom import AtomFeed
 import mimetypes
@@ -258,7 +258,7 @@ def generate_catalog(request, page_obj):
                     openSearch_totalResults=page_obj.paginator.count
                     )
     
-    bbparser = bbcode.Parser(replace_cosmetic=False)
+    bbparser = fimfic_bbcode.Parser()
     for book in page_obj.object_list:
         
         linklist = [
@@ -321,7 +321,7 @@ def generate_catalog(request, page_obj):
             'summary': book.a_summary,
             # The Unicode concatenation forces the output of bbparser to Unicode.
             # bbparser outputs a string instead of Unicode if the input is a empty Unicode/string object
-            'content': ( {'type':'xhtml'}, u"" + bbparser.format(book.a_content) ),
+            'content': ( {'type':'html'}, u"" + bbparser.format(book.a_content) ),
             'links': linklist,
             'authors': authors,
             'categories': categories,
