@@ -325,6 +325,7 @@ def generate_catalog(request, page_obj):
             'links': linklist,
             'authors': authors,
             'categories': categories,
+            'published': book.a_published,
             'dc_publisher': book.dc_publisher,
             'dc_issued': str(book.dc_issued),
             'dc_identifier': book.dc_identifier,
@@ -333,7 +334,7 @@ def generate_catalog(request, page_obj):
         if book.dc_language is not None:
             add_kwargs['dc_language'] = book.dc_language.code
 
-        feed.add_item( book.getUUID(), book.a_title, book.a_updated, **add_kwargs)
+        feed.add_item( book.getUUID(), book.a_title, book.updated, **add_kwargs)
 
     s = StringIO()
     feed.write(s, 'UTF-8')
