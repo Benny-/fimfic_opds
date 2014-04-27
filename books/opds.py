@@ -120,6 +120,11 @@ def generate_root_catalog():
                     'href': reverse('latest_feed')},
                     {'rel': 'alternate', 'href': reverse('latest_feed')}]},
                     
+        {'id': 'latest', 'title': 'Latest updated on fimfiction.net', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('updated_fimfic_feed')},
+                    {'rel': 'alternate', 'href': reverse('updated_fimfic_feed')}]},
+                    
         {'id': 'latest', 'title': 'By publish date', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('by_publish_latest_feed')},
@@ -340,7 +345,14 @@ def generate_catalog(request, page_obj):
         if book.dc_language is not None:
             add_kwargs['dc_language'] = book.dc_language.code
 
-        feed.add_item( book.getUUID(), book.a_title, book.updated, **add_kwargs)
+        feed.add_item(
+                book.getUUID(),
+                book.a_title,
+                book.updated,   # A items atom:updated should refer to the time the item was update on THIS server.
+                                # Therefore book.a_updated would be incorrect here, as it refers to the time it was
+                                # updated fimfiction.net's servers.
+                **add_kwargs
+                )
 
     s = StringIO()
     feed.write(s, 'UTF-8')
