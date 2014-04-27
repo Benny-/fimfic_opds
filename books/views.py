@@ -232,6 +232,10 @@ def root(request, qtype=None):
     root_catalog = generate_root_catalog()
     return HttpResponse(root_catalog, mimetype='application/atom+xml')
 
+def updated(request, qtype=None):
+    queryset = Book.objects.all().order_by('-updated')
+    return _book_list(request, queryset, qtype, list_by='updated')
+
 def latest(request, qtype=None):
     queryset = Book.objects.all()
     return _book_list(request, queryset, qtype, list_by='latest')

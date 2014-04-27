@@ -109,6 +109,12 @@ def generate_nav_catalog(subsections, is_root=False, links=None):
 
 def generate_root_catalog():
     subsections = [
+    
+        {'id': 'latest', 'title': 'Latest updated', 'updated': datetime.datetime.now(),
+         'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
+                    'href': reverse('latest_feed')},
+                    {'rel': 'alternate', 'href': reverse('updated_feed')}]},
+    
         {'id': 'latest', 'title': 'Latest added', 'updated': datetime.datetime.now(),
          'links': [{'rel': 'subsection', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition', \
                     'href': reverse('latest_feed')},

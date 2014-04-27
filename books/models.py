@@ -111,7 +111,7 @@ class Book(models.Model):
     tags = TaggableManager(blank=True)
     downloads = models.IntegerField(default=0)
     id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
-    updated = models.DateTimeField(auto_now=True, blank=True) # When this database record was updated. Also see a_updated
+    updated = models.DateTimeField(auto_now_add=True, auto_now=True) # When this database record was updated. Also see a_updated
     words = models.IntegerField(blank=True, null=True)
     views = models.IntegerField(blank=True, null=True)
     comments = models.IntegerField(blank=True, null=True)
@@ -133,7 +133,7 @@ class Book(models.Model):
     a_rights = models.CharField('atom:rights', max_length=200, blank=True)
     dc_language = models.ForeignKey(Language, blank=True, null=True)
     dc_publisher = models.CharField('dc:publisher', max_length=200, blank=True)
-    dc_issued = models.DateTimeField() # The first time the ebook apear in public
+    dc_issued = models.DateTimeField() # The first time the ebook apeared in public
     dc_identifier = models.CharField('dc:identifier', max_length=50, \
         help_text='Use ISBN for this', blank=True)
     

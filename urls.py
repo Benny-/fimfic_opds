@@ -33,6 +33,8 @@ urlpatterns = patterns('',
     # Book list Atom:
     (r'^opds/$', 'pathagar.books.views.root',
      {'qtype': u'feed'}, 'root_feed'),
+    (r'^opds/latest/updated$', 'pathagar.books.views.updated',
+     {'qtype': u'feed'}, 'updated_feed'),
     (r'^opds/latest/added$', 'pathagar.books.views.latest',
      {'qtype': u'feed'}, 'latest_feed'),
     (r'^opds/latest/published/newest$', 'pathagar.books.views.by_publish_latest',
