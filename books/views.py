@@ -105,7 +105,9 @@ def book_detail(request, book_id):
 # The filename is ignored.
 def download_book(request, book_id, filename):
     book = get_object_or_404(Book, pk=book_id)
-
+    
+    filename = filename + '?' +request.META['QUERY_STRING']
+    
     # TODO, currently the downloads counter is incremented when the
     # download is requested, without knowing if the file sending was
     # successfull:
