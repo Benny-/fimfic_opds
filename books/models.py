@@ -88,7 +88,7 @@ class Status(models.Model):
 
 class Author(models.Model):
     id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
-    name = models.CharField(max_length=200, blank=False)
+    name = models.CharField(db_index=True, max_length=200, blank=False)
     
     def getLink(self):
         return 'https://www.fimfiction.net/user/' + self.name.replace(' ', '+')
@@ -109,22 +109,22 @@ class Book(models.Model):
 
     """
     tags = TaggableManager(blank=True)
-    downloads = models.IntegerField(default=0)
+    downloads = models.IntegerField(db_index=True, default=0)
     id = models.IntegerField(primary_key=True, null=False) # This id is the same as the one used in fimfiction
-    updated = models.DateTimeField(auto_now_add=True, auto_now=True) # When this database record was updated.
-    fimfic_updated = models.DateTimeField('atom:updated', blank=True, null=True) # updated in the sense when the book itself (or its description) was last changed or updated. This date comes from fimfiction.net
-    words = models.IntegerField(blank=True, null=True)
-    views = models.IntegerField(blank=True, null=True)
-    comments = models.IntegerField(blank=True, null=True)
-    likes = models.IntegerField(blank=True, null=True)
-    dislikes = models.IntegerField(blank=True, null=True)
-    rating = models.ForeignKey(Rating, blank=False, null=False)
+    updated = models.DateTimeField(db_index=True, auto_now_add=True, auto_now=True) # When this database record was updated.
+    fimfic_updated = models.DateTimeField(db_index=True, blank=True, null=True) # updated in the sense when the book itself (or its description) was last changed or updated. This date comes from fimfiction.net
+    words = models.IntegerField(db_index=True, blank=True, null=True)
+    views = models.IntegerField(db_index=True, blank=True, null=True)
+    comments = models.IntegerField(db_index=True, blank=True, null=True)
+    likes = models.IntegerField(db_index=True, blank=True, null=True)
+    dislikes = models.IntegerField(db_index=True, blank=True, null=True)
+    rating = models.ForeignKey(Rating, db_index=True, blank=False, null=False)
     a_thumbnail = models.CharField(max_length=16, blank=True, null=True,
                     help_text='A small thumbnail image. Image filename + extension.')
     a_cover = models.CharField(max_length=16, blank=True, null=True,
                     help_text='A bigger image. most of the time the same as the thumbnail but bigger. Image filename + extension.')
     a_status = models.ForeignKey(Status, blank=False, null=False)
-    a_title = models.CharField('atom:title', max_length=200)
+    a_title = models.CharField('atom:title', db_index=True, max_length=200)
     a_authors = models.ManyToManyField(Author) # fimfic does not support multiple authors for a single story. But we support it anyway in case it changes.
     a_published = models.DateTimeField(auto_now_add=True, blank=True) # Published on this specific book server. Also see dc_issued
     a_summary = models.TextField('atom:summary', blank=True) # Short description
@@ -133,7 +133,7 @@ class Book(models.Model):
     a_rights = models.CharField('atom:rights', max_length=200, blank=True)
     dc_language = models.ForeignKey(Language, blank=True, null=True)
     dc_publisher = models.CharField('dc:publisher', max_length=200, blank=True)
-    dc_issued = models.DateTimeField() # The first time the ebook apeared in public
+    dc_issued = models.DateTimeField(db_index=True) # The first time the ebook apeared in public
     dc_identifier = models.CharField('dc:identifier', max_length=50, \
         help_text='Use ISBN for this', blank=True)
     
