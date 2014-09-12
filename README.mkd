@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is a modified Pathagar book server. It is designed to (only) serve fimfiction.net ebook meta-data.
+This is a modified Pathagar book server. It is designed to - only - serve fimfiction.net ebook meta-data. It focuses on OPDS views & bulk import. HTML views and book management have been neglected and are not guaranteed to work.
 
 See [the orginal code this project is based on](https://github.com/PathagarBooks/pathagar)
 
