@@ -101,14 +101,14 @@ class Command(BaseCommand):
             book_dict['rating'] = ffstory['content_rating']
             
             book_dict['dc_issued'] = date.fromtimestamp(ffstory['date_modified'])
-            book_dict['a_updated'] = date.fromtimestamp(ffstory['date_modified'])
+            book_dict['fimfic_updated'] = date.fromtimestamp(ffstory['date_modified'])
             if 'chapters' in ffstory:
                 for chapter in ffstory['chapters']:
                     chapter_modified_time = date.fromtimestamp(chapter['date_modified']);
                     if(book_dict['dc_issued'] > chapter_modified_time):
                         book_dict['dc_issued'] = chapter_modified_time
-                    if(book_dict['a_updated'] < chapter_modified_time):
-                        book_dict['a_updated'] = chapter_modified_time
+                    if(book_dict['fimfic_updated'] < chapter_modified_time):
+                        book_dict['fimfic_updated'] = chapter_modified_time
             
             book_dict['a_title'] = unescape(ffstory['title'])
             book_dict['a_status'] = ffstory['status']
@@ -168,6 +168,7 @@ class Command(BaseCommand):
     
     def _handle_directory(self, fimficpath):
         file_paths = glob( os.path.join( fimficpath, "*.json") )
+        print("Processing " + str(len(file_paths)) + " json files")
         for file_path in file_paths:
             try:
                 self._handle_json(file_path)

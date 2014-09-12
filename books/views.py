@@ -243,7 +243,7 @@ def latest(request, qtype=None):
     return _book_list(request, queryset, qtype, list_by='latest')
 
 def by_updated_fimfic(request, qtype=None):
-    queryset = Book.objects.all().order_by('-a_updated')
+    queryset = Book.objects.all().order_by('-fimfic_updated')
     return _book_list(request, queryset, qtype, list_by='by-updated-fimfic')
 
 def by_publish_latest(request, qtype=None):

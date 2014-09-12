@@ -349,8 +349,6 @@ def generate_catalog(request, page_obj):
                 book.getUUID(),
                 book.a_title,
                 book.updated,   # A items atom:updated should refer to the time the item was update on THIS server.
-                                # Therefore book.a_updated would be incorrect here, as it refers to the time it was
-                                # updated fimfiction.net's servers.
                 **add_kwargs
                 )
 
