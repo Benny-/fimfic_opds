@@ -89,7 +89,7 @@ class Command(BaseCommand):
         book_dict = {}
         with open(file_path) as f:
             # Here we convert a fimfic dict into our native book format
-            ffstory = json.load(f)['story'];
+            ffstory = json.load(f)['story']; # This function could throw a ValueError
             
             book_dict['id'] = ffstory['id']
             book_dict['words'] = ffstory['words']
@@ -169,11 +169,21 @@ class Command(BaseCommand):
     def _handle_directory(self, fimficpath):
         file_paths = glob( os.path.join( fimficpath, "*.json") )
         print("Processing " + str(len(file_paths)) + " json files")
+        processed = 0
+        exceptions = []
         for file_path in file_paths:
             try:
                 self._handle_json(file_path)
-            except ValueError as ex: # json.load(f) throws this exception if file is not json.
+                processed += 1
+            except ValueError as ex:
+                exceptions.append( (file_path, ex) )
                 print("Could not process " + file_path + " -> " + str(ex) );
+            except KeyError as ex:
+                exceptions.append( (file_path, ex) )
+                print("Could not process " + file_path + " -> " + str(ex) );
+        print str(processed) + " succesfully processed and " + str(len(exceptions)) + " not processed"
+        for file_path, ex in exceptions:
+            print("Could not process " + file_path + " -> " + str(ex) );
 
     def handle(self, filepath='', *args, **options):
         if not os.path.exists(filepath):
