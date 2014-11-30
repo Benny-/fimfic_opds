@@ -162,6 +162,7 @@ class Command(BaseCommand):
             except:
                 # Book does not exist, lets make one.
                 book = Book(**book_dict)
+                book.save()
                 book.a_authors.add(author)
                 [book.a_categories.add(category) for category in a_categories]
                 book.save()
