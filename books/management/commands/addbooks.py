@@ -172,10 +172,11 @@ class Command(BaseCommand):
     
     def _handle_directory(self, fimficpath):
         file_paths = glob( os.path.join( fimficpath, "*.json") )
-        print("Processing " + str(len(file_paths)) + " json files")
+        sorted_file_paths = sorted(file_paths, key=lambda filename: int(filename.split(os.sep).pop()[:-5]))
+        print("Processing " + str(len(sorted_file_paths)) + " json files")
         processed = 0
         exceptions = []
-        for file_path in file_paths:
+        for file_path in sorted_file_paths:
             try:
                 self._handle_json(file_path)
                 processed += 1
