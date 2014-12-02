@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+from django.db import transaction
+
 from django.core.management.base import BaseCommand, CommandError
 from django.core.files.storage import default_storage
 from django.core.files import File
@@ -131,6 +133,7 @@ class Command(BaseCommand):
                     book_dict['a_categories'].append(k)
         return book_dict
 
+    @transaction.commit_on_success
     def _handle_json(self, file_path):
         with open(file_path) as f:
             book_dict = self._json_file_to_json(file_path)
