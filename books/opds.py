@@ -244,19 +244,19 @@ def generate_authors_catalog(request, authors, page_obj):
 
 def generate_catalog(request, page_obj):
     links = []
-    links.append({'title': 'Home', 'type': 'application/atom+xml',
+    links.append({'title': 'Home', 'type': 'application/atom+xml;profile=opds-catalog;kind=navigation',
                   'rel': 'start',
                   'href': reverse('pathagar.books.views.root')})
 
     if page_obj.has_previous():
         previous_page = page_obj.previous_page_number()
-        links.append({'title': 'Previous results', 'type': 'application/atom+xml',
+        links.append({'title': 'Previous results', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
                       'rel': 'previous',
                       'href': request.path + page_qstring(request, previous_page)})
     
     if page_obj.has_next():
         next_page = page_obj.next_page_number()
-        links.append({'title': 'Next results', 'type': 'application/atom+xml',
+        links.append({'title': 'Next results', 'type': 'application/atom+xml;profile=opds-catalog;kind=acquisition',
                       'rel': 'next',
                       'href': request.path + page_qstring(request, next_page)})
     
