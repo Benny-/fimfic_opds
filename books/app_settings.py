@@ -30,6 +30,10 @@ FEED_TITLE = getattr(settings, 'FEED_TITLE', u'My Little Pony')
 FEED_ICON_LOCATION = getattr(settings, 'FEED_ICON_LOCATION', u'/static/images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png')
 FEED_DESCRIPTION = getattr(settings, 'FEED_DESCRIPTION', u'Ebooks from fimfiction.net')
 
+# A link to the ebook transformer service. https://github.com/Benny-/fim-ebook-transformer
+# Users who wish to download a ebook are redirected to this service.
+FIM_EBOOK_TRANSFORMER = getattr(settings, 'FIM_EBOOK_TRANSFORMER', u"http://unsafe.mylittleserver.nl:4100")
+
 # If True, serve static media via Django.  Note that this is not
 # recommended for production:
 

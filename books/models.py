@@ -25,6 +25,8 @@ from langlist import langs
 import urllib
 import os
 
+from app_settings import FIM_EBOOK_TRANSFORMER
+
 class Language(models.Model):
     label = models.CharField('language name', max_length=50, blank=False, unique=True)
     code = models.CharField(max_length=4, blank=True)
@@ -158,7 +160,7 @@ class Book(models.Model):
     
     def getDownloadUrl(self, fileName):
         fileName, fileExtension = os.path.splitext(fileName)
-        return u'https://www.fimfiction.net/download_epub.php?story=' + str(self.id)
+        return FIM_EBOOK_TRANSFORMER + '/book/' + str(self.id) + u'/download/' + urllib.quote(self.a_title.encode('UTF-8')) + fileExtension[:5]
     
     def save(self, *args, **kwargs):
         super(Book, self).save(*args, **kwargs)
