@@ -112,15 +112,17 @@ class Command(BaseCommand):
                     if(book_dict['fimfic_updated'] < chapter_modified_time):
                         book_dict['fimfic_updated'] = chapter_modified_time
             
-            book_dict['a_title'] = unescape(ffstory['title'])
+            book_dict['a_title'] = unescape(ffstory['title'])[:200]
+            if(book_dict['a_title'] != unescape(ffstory['title'])):
+                print(str(book_dict['id']) + ': title has been trimmed')
             book_dict['a_status'] = ffstory['status']
             book_dict['a_summary'] = unescape(ffstory['short_description'])
             book_dict['a_content'] = unescape(ffstory['description'])
             
             if 'image' in ffstory:
-                book_dict['a_thumbnail'] = ffstory['image'].split('/').pop()
+                book_dict['a_thumbnail'] = ffstory['image'].split('/').pop().split("?")[0]
             if 'full_image' in ffstory:
-                book_dict['a_cover'] = ffstory['full_image'].split('/').pop()
+                book_dict['a_cover'] = ffstory['full_image'].split('/').pop().split("?")[0]
             
             author_dict = {}
             author_dict['id'] = ffstory['author']['id']
@@ -200,5 +202,4 @@ class Command(BaseCommand):
             self._handle_json(filepath)
         else:
             self._handle_csv(filepath)
-
 
