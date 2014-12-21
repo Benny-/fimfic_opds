@@ -114,6 +114,7 @@ class Feed(object):
             extra_attrs = self.__get_dynamic_attr('feed_extra_attrs', obj),
             hide_generator = self.__get_dynamic_attr('hide_generator', obj, default=False),
             openSearch_totalResults = self.__get_dynamic_attr('openSearch_totalResults', obj, default=None),
+            openSearch_itemsPerPage = self.__get_dynamic_attr('openSearch_itemsPerPage', obj, default=None),
         )
 
         items = self.__get_dynamic_attr('items', obj)
@@ -157,7 +158,8 @@ class AtomFeed(object):
 
 
     def __init__(self, atom_id, title, updated=None, icon=None, logo=None, rights=None, subtitle=None,
-        authors=[], categories=[], contributors=[], links=[], extra_attrs={}, hide_generator=False, openSearch_totalResults=None):
+        authors=[], categories=[], contributors=[], links=[], extra_attrs={}, hide_generator=False,
+        openSearch_totalResults=None, openSearch_itemsPerPage=None):
         if atom_id is None:
             raise LookupError('Feed has no feed_id field')
         if title is None:
@@ -178,6 +180,7 @@ class AtomFeed(object):
             'extra_attrs': extra_attrs,
             'hide_generator': hide_generator,
             'openSearch_totalResults': openSearch_totalResults,
+            'openSearch_itemsPerPage': openSearch_itemsPerPage,
         }
         self.items = []
 
@@ -328,6 +331,8 @@ class AtomFeed(object):
             handler.addQuickElement(u'updated', rfc3339_date(self.latest_updated()))
         if self.feed.get('openSearch_totalResults'):
             handler.addQuickElement(u'opensearch:totalResults', str(self.feed['openSearch_totalResults']) )
+        if self.feed.get('openSearch_itemsPerPage'):
+            handler.addQuickElement(u'opensearch:itemsPerPage', str(self.feed['openSearch_itemsPerPage']) )
         for category in self.feed['categories']:
             self.write_category_construct(handler, category)
         for link in self.feed['links']:

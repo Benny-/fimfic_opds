@@ -266,7 +266,8 @@ def generate_catalog(request, page_obj):
                     extra_attrs = ATTRS,
                     hide_generator=True,
                     links=links,
-                    openSearch_totalResults=page_obj.paginator.count
+                    openSearch_totalResults=page_obj.paginator.count,
+                    openSearch_itemsPerPage=page_obj.paginator.num_pages,
                     )
     
     bbparser = fimfic_bbcode.Parser()
