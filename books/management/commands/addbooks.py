@@ -154,9 +154,10 @@ class Command(BaseCommand):
                 author = Author(**author_dict)
                 author.save()
             
+            existing_book = None
+            
             try:
                 existing_book = Book.objects.get( id = book_dict['id'] )
-                # Insert code here to update a existing book.
             except:
                 # Book does not exist, lets make one.
                 book = Book(**book_dict)
@@ -164,6 +165,38 @@ class Command(BaseCommand):
                 book.a_authors.add(author)
                 [book.a_categories.add(category) for category in a_categories]
                 book.save()
+    
+            if existing_book != None:
+                if not existing_book.sameAsDict(book_dict):
+                    print("Updating book")
+                    print(" ", book_dict.get('a_thumbnail'))
+                    
+                    existing_book.updated = book_dict.get('updated')
+                    existing_book.fimfic_updated = book_dict.get('fimfic_updated')
+                    existing_book.words = book_dict.get('words')
+                    existing_book.views = book_dict.get('views')
+                    existing_book.comments = book_dict.get('comments')
+                    existing_book.likes = book_dict.get('likes')
+                    existing_book.dislikes = book_dict.get('dislikes')
+                    existing_book.rating = book_dict.get('rating')
+                    existing_book.a_thumbnail = book_dict.get('a_thumbnail')
+                    existing_book.a_cover = book_dict.get('a_cover')
+                    existing_book.a_status = book_dict.get('a_status')
+                    existing_book.a_title = book_dict.get('a_title')
+                    existing_book.a_published = book_dict.get('a_published')
+                    existing_book.a_summary = book_dict.get('downa_summaryloads')
+                    existing_book.a_content = book_dict.get('a_content')
+                    existing_book.a_rights = book_dict.get('a_rights')
+                    existing_book.dc_language = book_dict.get('dc_language')
+                    existing_book.dc_publisher = book_dict.get('dc_publisher')
+                    existing_book.dc_issued = book_dict.get('dc_issued')
+                    existing_book.dc_identifier = book_dict.get('dc_identifier')
+                    
+                    existing_book.a_authors.add(author)
+                    [existing_book.a_categories.add(category) for category in a_categories]
+                    existing_book.save()
+                else:
+                    print("Not updating book. Book is the same.")
     
     def _handle_directory(self, fimficpath):
         file_paths = glob( os.path.join( fimficpath, "*.json") )
@@ -177,10 +210,10 @@ class Command(BaseCommand):
                 processed += 1
             except ValueError as ex:
                 exceptions.append( (file_path, ex) )
-                print("Could not process " + file_path + " -> " + str(ex) );
+                print("Could not process (ValueError) " + file_path + " -> " + str(ex) );
             except KeyError as ex:
                 exceptions.append( (file_path, ex) )
-                print("Could not process " + file_path + " -> " + str(ex) );
+                print("Could not process (KeyError) " + file_path + " -> " + str(ex) );
         print str(processed) + " succesfully processed and " + str(len(exceptions)) + " not processed"
         for file_path, ex in exceptions:
             print("Could not process " + file_path + " -> " + str(ex) );

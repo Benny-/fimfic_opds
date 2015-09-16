@@ -121,9 +121,9 @@ class Book(models.Model):
     likes = models.IntegerField(db_index=True, blank=True, null=True)
     dislikes = models.IntegerField(db_index=True, blank=True, null=True)
     rating = models.ForeignKey(Rating, db_index=True, blank=False, null=False)
-    a_thumbnail = models.CharField(max_length=16, blank=True, null=True,
+    a_thumbnail = models.CharField(max_length=64, blank=True, null=True,
                     help_text='A small thumbnail image. Image filename + extension.')
-    a_cover = models.CharField(max_length=16, blank=True, null=True,
+    a_cover = models.CharField(max_length=64, blank=True, null=True,
                     help_text='A bigger image. most of the time the same as the thumbnail but bigger. Image filename + extension.')
     a_status = models.ForeignKey(Status, blank=False, null=False)
     a_title = models.CharField('atom:title', db_index=True, max_length=200)
@@ -177,27 +177,6 @@ class Book(models.Model):
         return ('pathagar.books.views.book_detail', [self.pk])
 
     def sameAsDict(self, other):
-        """This function is not tested. Testing is for whimps"""
-        return         self.tags == other.tags
-                and    self.downloads == other.downloads
-                and    self.fimfic_updated == other.fimfic_updated
-                and    self.words == other.words
-                and    self.views == other.views
-                and    self.comments == other.comments
-                and    self.likes == other.likes
-                and    self.dislikes == other.dislikes
-                and    self.rating == other.rating
-                and    self.a_thumbnail == other.a_thumbnail
-                and    self.a_cover == other.a_cover
-                and    self.a_status == other.a_status
-                and    self.a_title == other.a_title
-                and    self.a_authors == other.a_authors
-                and    self.a_published == other.a_published
-                and    self.a_summary == other.a_summary
-                and    self.a_content == other.a_content
-                and    self.a_categories == other.a_categories
-                and    self.a_rights == other.a_rights
-                and    self.dc_language == other.dc_language
-                and    self.dc_publisher == other.dc_publisher
-                and    self.dc_issued == other.dc_issued
-                and    self.dc_identifier == other.dc_identifier
+        """Hello."""
+        return False
+
