@@ -17,23 +17,16 @@
 from django.db import transaction
 
 from django.core.management.base import BaseCommand, CommandError
-from django.core.files.storage import default_storage
-from django.core.files import File
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.utils import IntegrityError
 
 from glob import glob
-import sys
 import os
-import csv
 import json
 from optparse import make_option
-import urllib
 from datetime import date
 
 from books.models import Status, Rating, Author, Category, Book
-import settings
 
 import re, htmlentitydefs
 

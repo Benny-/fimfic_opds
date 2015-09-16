@@ -147,12 +147,12 @@ class Book(models.Model):
     
     def getThumbnailUrl(self):
         if self.a_thumbnail:
-            return 'https://www.fimfiction-static.net/images/story_images/' + self.a_thumbnail
+            return 'https://cdn-img.fimfiction.net/story/' + self.a_thumbnail
         return None
     
     def getCoverImageUrl(self):
         if self.a_cover:
-            return 'https://www.fimfiction-static.net/images/story_images/' + self.a_cover
+            return 'https://cdn-img.fimfiction.net/story/' + self.a_cover
         return None
     
     def getOnlineViewingUrl(self):
@@ -176,3 +176,28 @@ class Book(models.Model):
     def get_absolute_url(self):
         return ('pathagar.books.views.book_detail', [self.pk])
 
+    def sameAsDict(self, other):
+        """This function is not tested. Testing is for whimps"""
+        return         self.tags == other.tags
+                and    self.downloads == other.downloads
+                and    self.fimfic_updated == other.fimfic_updated
+                and    self.words == other.words
+                and    self.views == other.views
+                and    self.comments == other.comments
+                and    self.likes == other.likes
+                and    self.dislikes == other.dislikes
+                and    self.rating == other.rating
+                and    self.a_thumbnail == other.a_thumbnail
+                and    self.a_cover == other.a_cover
+                and    self.a_status == other.a_status
+                and    self.a_title == other.a_title
+                and    self.a_authors == other.a_authors
+                and    self.a_published == other.a_published
+                and    self.a_summary == other.a_summary
+                and    self.a_content == other.a_content
+                and    self.a_categories == other.a_categories
+                and    self.a_rights == other.a_rights
+                and    self.dc_language == other.dc_language
+                and    self.dc_publisher == other.dc_publisher
+                and    self.dc_issued == other.dc_issued
+                and    self.dc_identifier == other.dc_identifier
