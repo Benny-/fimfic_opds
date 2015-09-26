@@ -169,7 +169,6 @@ class Command(BaseCommand):
             if existing_book != None:
                 if not existing_book.sameAsDict(book_dict):
                     print("Updating book")
-                    print(" ", book_dict.get('a_thumbnail'))
                     
                     existing_book.updated = book_dict.get('updated')
                     existing_book.fimfic_updated = book_dict.get('fimfic_updated')
@@ -183,14 +182,18 @@ class Command(BaseCommand):
                     existing_book.a_cover = book_dict.get('a_cover')
                     existing_book.a_status = book_dict.get('a_status')
                     existing_book.a_title = book_dict.get('a_title')
-                    existing_book.a_published = book_dict.get('a_published')
-                    existing_book.a_summary = book_dict.get('downa_summaryloads')
+                    if 'a_published' in book_dict:
+                        existing_book.a_published = book_dict.get('a_published')
+                    existing_book.a_summary = book_dict.get('a_summary')
                     existing_book.a_content = book_dict.get('a_content')
-                    existing_book.a_rights = book_dict.get('a_rights')
+                    if 'a_rights' in book_dict:
+                        existing_book.a_rights = book_dict.get('a_rights')
                     existing_book.dc_language = book_dict.get('dc_language')
-                    existing_book.dc_publisher = book_dict.get('dc_publisher')
+                    if 'dc_publisher' in book_dict:
+                        existing_book.dc_publisher = book_dict.get('dc_publisher')
                     existing_book.dc_issued = book_dict.get('dc_issued')
-                    existing_book.dc_identifier = book_dict.get('dc_identifier')
+                    if 'dc_identifier' in book_dict:
+                        existing_book.dc_identifier = book_dict.get('dc_identifier')
                     
                     existing_book.a_authors.add(author)
                     [existing_book.a_categories.add(category) for category in a_categories]
