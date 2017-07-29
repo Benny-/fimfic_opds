@@ -281,12 +281,6 @@ def generate_catalog(request, page_obj):
                             'type': 'application/epub+zip'
                         },
                         {
-                            'rel': 'http://opds-spec.org/acquisition',
-                            'href': reverse('pathagar.books.views.download_book',
-                                            kwargs=dict(book_id=book.pk, filename=book.a_title+".mobi" )),
-                            'type': 'application/x-mobipocket-ebook'
-                        },
-                        {
                             'href': book.getOnlineViewingUrl(),
                         },
                    ]

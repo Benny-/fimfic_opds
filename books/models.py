@@ -160,7 +160,7 @@ class Book(models.Model):
     
     def getDownloadUrl(self, fileName):
         fileName, fileExtension = os.path.splitext(fileName)
-        return FIM_EBOOK_TRANSFORMER + '/book/' + str(self.id) + u'/download/' + urllib.quote(self.a_title.encode('UTF-8')) + fileExtension[:5]
+        return FIM_EBOOK_TRANSFORMER.format(self.id, self.id)
     
     def save(self, *args, **kwargs):
         super(Book, self).save(*args, **kwargs)

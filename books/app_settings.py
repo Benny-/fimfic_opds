@@ -32,7 +32,7 @@ FEED_DESCRIPTION = getattr(settings, 'FEED_DESCRIPTION', u'Ebooks from fimfictio
 
 # A link to the ebook transformer service. https://github.com/Benny-/fim-ebook-transformer
 # Users who wish to download a ebook are redirected to this service.
-FIM_EBOOK_TRANSFORMER = getattr(settings, 'FIM_EBOOK_TRANSFORMER', u"http://unsafe.mylittleserver.nl:4100")
+FIM_EBOOK_TRANSFORMER = getattr(settings, 'FIM_EBOOK_TRANSFORMER', u'http://fimfiction.djazz.se/story/{}/download/fimfic_{}.epub')
 
 # If True, serve static media via Django.  Note that this is not
 # recommended for production:
