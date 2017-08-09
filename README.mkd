@@ -1,77 +1,28 @@
 Introduction
 ============
 
-This is a modified Pathagar book server. It is designed to - only - serve fimfiction.net ebook meta-data. It focuses on OPDS views & bulk import. HTML views and book management have been neglected and are not guaranteed to work.
+This is a heavy modified Pathagar book server made using the [Django](https://www.djangoproject.com/) framework. It is designed to - only - serve fimfiction.net ebook meta-data. It focuses on OPDS views & bulk import. HTML views and book management are removed.
 
-See [the orginal code this project is based on](https://github.com/PathagarBooks/pathagar)
+See the [orginal code](https://github.com/PathagarBooks/pathagar) this project is based on.
 
-Setting up Pathagar using Fabric (BETA)
-=======================================
-
-Fabric is the most convenient way to setup Pathagar on your server.
-
-To setup pathagar using fabric you first need to install Fabric and Virtualenv. 
-
-Note: If you are running a red-hat based machine. Replace "ubuntu" in the following commands/paths to fedora and follow the same procedure.
-
-After installing edit `deploy/ubuntu/fabric.py` , `deploy/ubuntu/settings.conf` and `deploy/ubuntu/virtualhost.conf` to configure the server according to your needs.
-
-Great! Now you are ready to deploy.
-
-First we need to create the directories that will hold pathagar's code, logs and environment. To do this run the following command:
-
-`fab ubuntu bootstrap` 
-
-Now we need to configure apache and let it know about the location of the files. To do that run:
-
-`fab ubuntu deploy`
-
-Perfect! Now we have apache running our server through mod_wsgi. Now we need to setup our databases.
-
-`fab ubuntu create_db`
-
-`fab ubuntu setup_db`
-
-Done! You should now have a working instance of pathagar running on your server.
-
-Please note that our fabric scripts are still under beta. If you come across any problems please feel free to ask for help.
-
-OPDS
-====
-
-It uses the OPDS spec:
-
-http://opds-spec.org
-
-Books can be added via the admin interface, as well as via the command
-line, in batch (JSON files or a directory with JSON
-files), through the command:
-
-    python manage.py addbooks --json book.json
-  
-            OR
-            
-    python manage.py addbooks --dir "directory/containing/json-files/"
-
-Pathagar runs on the python web app framework Django.  It is known to work in Django 1.3 and 1.4.
-
-Format of JSON file
-===================
-
-To add books from a JSON file:
-
-    python manage.py addbooks --json book.json
-
-The format of the JSON file is the same as fimfiction's format. you can view a sample json file [here](https://www.fimfiction.net/api/story.php?story=45860).
-
-Dependencies
+Requirements
 ============
 
-* Python
-* Django
-* django-taggit
-* django-sendfile
-* bbcode
+* [Python](https://www.python.org/)
+* [pip](https://pip.pypa.io/en/stable/installing/#installation)
+
+Python dependencies
+============
+
+Run the following commands. You might need to run it as administrator if your packages are stored in a privileged place.
+
+```bash
+pip install "django>=1.11.4"
+pip install "oauthlib>=2.0.2"
+pip install "requests_oauthlib>=0.8.0"
+pip install "jsonapi_requests>=0.3.2"
+pip install "ciso8601>=1.0.3" #ISO 8601 datetime parser
+```
 
 Quickstart
 ==========
@@ -80,9 +31,9 @@ Quickstart
 
     pip install -r requirements.pip
 
+* Edit settings.py to suite your needs and environment.
 
-* In the Pathagar folder edit settings.py to suite your needs and
-  environment.
+    It is crucial to change client_id and client_secret to valid values obtained from a fimfiction site admin.
 
 * In the Pathagar folder, run
 
@@ -90,16 +41,21 @@ Quickstart
 
   You will be asked to create an admin user during this stage. You can answer 'no' here.
 
-* To run the server, run
+* To run the server in development mode, run
 
     python manage.py runserver
 
   This starts a server listening on localhost, port 8000
 
-* With your browser, access http://localhost:8000 and see if the index
-  page comes up. If it comes up, click on "Add books" in the footer to
-  start adding books. You will be asked for a username/password. This is
-  the admin username/password you supplied while running syncdb.
+* With your browser, access http://localhost:8000/fimfic/opds/
 
 * To run the server in a production environment, look at Django deployment
-  docs at : http://docs.djangoproject.com/en/1.4/howto/deployment/
+  docs at : https://docs.djangoproject.com/en/1.11/howto/deployment/
+
+OPDS
+====
+
+This server adheres to the OPDS specification:
+
+http://opds-spec.org
+

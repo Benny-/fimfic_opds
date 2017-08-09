@@ -9,6 +9,7 @@
 #
 # Copyright (c) 2007, James Tauber
 # Copyright (c) 2010, Kushal Das <kushal@fedoraproject.org>
+# Copyright (c) 2017, Benny Jacobs <Benny@gmx.it>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +30,7 @@
 # THE SOFTWARE.
 #
 
-from xml import SimplerXMLGenerator
+from .xml import SimplerXMLGenerator
 
 from datetime import datetime
 

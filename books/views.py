@@ -1,328 +1,123 @@
-# Copyright (C) 2010, One Laptop Per Child
-# Copyright (C) 2010, Kushal Das
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-import os
-
-from django.http import HttpResponse
-from django.http import Http404
-from django.shortcuts import render_to_response
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.core.files.base import ContentFile
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.views.generic.list_detail import object_list, object_detail
-from django.views.generic.create_update import create_object, update_object, \
-  delete_object
-from django.template import RequestContext, resolve_variable
-from django.core.urlresolvers import reverse
-
-from app_settings import BOOKS_PER_PAGE, AUTHORS_PER_PAGE, SEARCH_SHORTNAME, SEARCH_DESCRIPTION
+from io import StringIO
+import urllib
+import datetime
+import ciso8601
 from django.conf import settings
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.urls import reverse, reverse_lazy
 
-# OLD ---------------
-from tagging.utils import get_tag
-from tagging.models import TaggedItem
-from tagging.models import Tag
-# --------------- OLD
-from taggit.models import Tag as tTag
+from .opds import Catalog, AcquisitionFeed, NavigationFeed, RootNavigationFeed
+from . import fimfic
 
-from sendfile import sendfile
+epoch = datetime.datetime.utcfromtimestamp(0)
 
-from opensearch import OpenSearch
-from search import simple_search, advanced_search
-from forms import BookForm, AddLanguageForm
-from langlist import langs as LANG_CHOICES
-from models import TagGroup, Book, Author
-from popuphandler import handlePopAdd
-from opds import page_qstring
-from opds import generate_catalog
-from opds import generate_root_catalog
-from opds import generate_authors_catalog
-from opds import generate_tags_catalog
-from opds import generate_taggroups_catalog
+catalog = Catalog('fimfiction:full-catalog',
+                    'Fimfiction',
+                    'Ebooks from fimfiction.net',
+                    reverse_lazy('fimfic_opds_root'),
+                    reverse_lazy('fimfic_opds_search'),
+                    icon=settings.STATIC_URL+'images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png')
 
-from pathagar.books.app_settings import BOOK_COMPLETED
+# Transforms a image url to a 3th party transform image url (3th party image converter). See https://images.weserv.nl/
+# This is done to guarantee we always have a consistent format.
+def imgUrlToOTFTransformUrl(url, format):
+    format = format.lower()
+    if format not in ['jpg', 'png', 'gif', 'webp']:
+        raise NotImplementedError("Format not supported")
+    parsed = urllib.parse.urlparse(url)
+    return 'https://images.weserv.nl/?output='+format+'&url=' + urllib.parse.quote('ssl:' + parsed.netloc + parsed.path + ('?' if len(parsed.query)>0 else '') + parsed.query)
 
-@login_required
-def add_language(request):
-    return handlePopAdd(request, AddLanguageForm, 'language')
-
-@login_required
-def add_book(request):
-    extra_context = {'action': 'add'}
-    return create_object(
-        request,
-        form_class = BookForm,
-        extra_context = extra_context,
-    )
-
-@login_required
-def edit_book(request, book_id):
-    extra_context = {'action': 'edit'}
-    return update_object(
-        request,
-        form_class = BookForm,
-        object_id = book_id,
-        template_object_name = 'book',
-        extra_context = extra_context,
-    )
-
-@login_required
-def remove_book(request, book_id):
-    return delete_object(
-        request,
-        model = Book,
-        object_id = book_id,
-        template_object_name = 'book',
-        post_delete_redirect = '/',
-    )
-
-def book_detail(request, book_id):
-    return object_detail(
-        request,
-        queryset = Book.objects.all(),
-        object_id = book_id,
-        template_object_name = 'book',
-    )
-
-# Example:
-# /book/25377/download/epub/filename_foo.epub
-# The filename is ignored.
-def download_book(request, book_id, filename):
-    book = get_object_or_404(Book, pk=book_id)
+def acquisitionFeed(request, sort, cursor=None):
+    api_response = fimfic.getBooks(sort, cursor)
+    next = None
+    prev = None
+    if 'prev' in api_response.content.links:
+        pass
+    if 'next' in api_response.content.links:
+        pass
+    acquisitionFeed = AcquisitionFeed(catalog, prev=prev, next=next)
+    for book in api_response.data:
     
-    filename = filename + '?' +request.META['QUERY_STRING']
-    
-    # TODO, currently the downloads counter is incremented when the
-    # download is requested, without knowing if the file sending was
-    # successfull:
-    book.downloads += 1
-    book.save()
-    return redirect( book.getDownloadUrl(filename) )
-
-def tags(request, qtype=None, group_slug=None):
-    context = {'list_by': 'by-tag'}
-
-    if group_slug is not None:
-        tag_group = get_object_or_404(TagGroup, slug=group_slug)
-        context.update({'tag_group': tag_group})
-        context.update({'tag_list': Tag.objects.get_for_object(tag_group)})
-    else:
-        context.update({'tag_list': tTag.objects.all()})
-
-    tag_groups = TagGroup.objects.all()
-    context.update({'tag_group_list': tag_groups})
-
-
-    # Return OPDS Atom Feed:
-    if qtype == 'feed':
-        catalog = generate_tags_catalog(context['tag_list'])
-        return HttpResponse(catalog, mimetype='application/atom+xml')
-
-    # Return HTML page:
-    return render_to_response(
-        'books/tag_list.html', context,
-        context_instance = RequestContext(request),
-    )
-
-def tags_listgroups(request, qtype=None):
-    tag_groups = TagGroup.objects.all()
-    catalog = generate_taggroups_catalog(tag_groups)
-    return HttpResponse(catalog, mimetype='application/atom+xml')
-
-def _book_list(request, queryset, qtype=None, list_by='latest', **kwargs):
-    """
-    Filter the books, paginate the result, and return either a HTML
-    book list, or a atom+xml OPDS catalog.
-
-    """
-    q = request.GET.get('q')
-    search_all = request.GET.get('search-all') == 'on'
-    search_title = request.GET.get('search-title') == 'on'
-    search_author = request.GET.get('search-author') == 'on'
-
-    context_instance = RequestContext(request)
-    user = resolve_variable('user', context_instance)
-    
-    completed_books_count = Book.objects.filter(a_status = BOOK_COMPLETED).count()
-    uncompleted_books_count = Book.objects.exclude(a_status = BOOK_COMPLETED).count()
-    
-    # If no search options are specified, assumes search all, the
-    # advanced search will be used:
-    if not search_all and not search_title and not search_author:
-        search_all = True
-
-    # If search queried, modify the queryset with the result of the
-    # search:
-    if q is not None:
-        if search_all:
-            queryset = advanced_search(queryset, q)
+        thumbnail = None
+        image = None
+        
+        if 'cover_image' in book.attributes:
+            if 'full' in book.attributes['cover_image']:
+                thumbnail = book.attributes['cover_image']['full']
+                
+            if 'large' in book.attributes['cover_image']:
+                thumbnail = book.attributes['cover_image']['large']
+                
+            if 'medium' in book.attributes['cover_image']:
+                thumbnail = book.attributes['cover_image']['medium']
+                
+            if 'thumbnail' in book.attributes['cover_image']:
+                thumbnail = book.attributes['cover_image']['thumbnail']
+        
+        
+            if 'thumbnail' in book.attributes['cover_image']:
+                image = book.attributes['cover_image']['full']
+                
+            if 'medium' in book.attributes['cover_image']:
+                image = book.attributes['cover_image']['full']
+                
+            if 'large' in book.attributes['cover_image']:
+                image = book.attributes['cover_image']['full']
+                
+            if 'full' in book.attributes['cover_image']:
+                image = book.attributes['cover_image']['full']
+        
+        if thumbnail is not None:
+            thumbnail = imgUrlToOTFTransformUrl(thumbnail, 'png')
+            thumbnail = {'url':thumbnail, 'type':'image/png'}
+        
+        if image is not None:
+            image = imgUrlToOTFTransformUrl(image, 'png')
+            image = {'url':image, 'type':'image/png'}
+        
+        published = None
+        if book.attributes['date_published'] is None:
+            published = epoch # Some data published are Null. That is why we have to do something like this.
         else:
-            queryset = simple_search(queryset, q,
-                                     search_title, search_author)
-
-    paginator = Paginator(queryset, BOOKS_PER_PAGE)
-    page = int(request.GET.get('page', '1'))
-
-    try:
-        page_obj = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        page_obj = paginator.page(paginator.num_pages)
-
-    # Build the query string:
-    qstring = page_qstring(request)
-
-    # Return OPDS Atom Feed:
-    if qtype == 'feed':
-        catalog = generate_catalog(request, page_obj)
-        return HttpResponse(catalog, mimetype='application/atom+xml')
-
-    # Return HTML page:
-    extra_context = dict(kwargs)
-    extra_context.update({
-        'book_list': page_obj.object_list,
-        'completed_books_count': completed_books_count,
-        'uncompleted_books_count': uncompleted_books_count,
-        'q': q,
-        'paginator': paginator,
-        'page_obj': page_obj,
-        'search_title': search_title,
-        'search_author': search_author,
-        'list_by': list_by,
-        'qstring': qstring,
-    })
-    return render_to_response(
-        'books/book_list.html',
-        extra_context,
-        context_instance = RequestContext(request),
-    )
-
-def _authors_list(request, queryset, qtype):
-    paginator = Paginator(queryset, AUTHORS_PER_PAGE)
-    page = int(request.GET.get('page', '1'))
+            ciso8601.parse_datetime(book.attributes['date_published'])
+        
+        acquisitionFeed.addBookEntry(
+                'urn:fimfiction:' + book.id,
+                book.attributes['title'].strip(),
+                published,
+                book.attributes['short_description'].strip(),
+                book.attributes['description_html'],
+                thumbnail=thumbnail,
+                image=image,
+                opds_url='http://fimfiction.djazz.se/story/{}/download/fimfic_{}.epub'.format(book.id, book.id),
+                html_url='https://www.fimfiction.net/story/'+book.id+'/'+urllib.parse.quote(book.attributes['title'].strip())
+            )
     
-    try:
-        page_obj = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        page_obj = paginator.page(paginator.num_pages)
+    sio = StringIO()
+    acquisitionFeed.write(sio, 'UTF-8')
+    return HttpResponse(sio.getvalue(), content_type='application/atom+xml')
+
+def cursor():
+    return HttpResponse('TODO: acquisitionFeedCursor is not yet implemented', content_type='text/plain', status=501)
+
+def search(request):
+    return HttpResponse('TODO: Search is not yet implemented', content_type='text/plain', status=501)
+
+def fimfic_opds_root(request):
+    navFeed = RootNavigationFeed(catalog)
     
-    if qtype == 'feed':
-        catalog = generate_authors_catalog(request, request, page_obj)
-        return HttpResponse(catalog, mimetype='application/atom+xml')
-    raise NotImplementedError("I don't have time to implement a html response. It was never my goal.")
+    navFeed.addAquisitionEntry('published', 'Latest published', reverse('fimfic_opds_by_published'))
+    navFeed.addAquisitionEntry('hotness', 'Hottest', reverse('fimfic_opds_by_hotness'))
+    navFeed.addAquisitionEntry('updated', 'Latest updated', reverse('fimfic_opds_by_update'))
+    navFeed.addAquisitionEntry('ratings', 'Highest rating', reverse('fimfic_opds_by_rating'))
+    navFeed.addAquisitionEntry('words', 'Most words', reverse('fimfic_opds_by_words'))
+    navFeed.addAquisitionEntry('views', 'Most views', reverse('fimfic_opds_by_views'))
+    navFeed.addAquisitionEntry('comments', 'Most comments', reverse('fimfic_opds_by_comments'))
+    navFeed.addAquisitionEntry('likes', 'Most likes', reverse('fimfic_opds_by_likes'))
+    navFeed.addAquisitionEntry('dislikes', 'Most dislikes', reverse('fimfic_opds_by_dislikes'))
     
-def home(request):
-    return redirect('latest')
-
-def root(request, qtype=None):
-    """Return the root catalog for navigation"""
-    root_catalog = generate_root_catalog()
-    return HttpResponse(root_catalog, mimetype='application/atom+xml')
-
-def updated(request, qtype=None):
-    queryset = Book.objects.all().order_by('-updated')
-    return _book_list(request, queryset, qtype, list_by='updated')
-
-def latest(request, qtype=None):
-    queryset = Book.objects.all()
-    return _book_list(request, queryset, qtype, list_by='latest')
-
-def by_updated_fimfic(request, qtype=None):
-    queryset = Book.objects.all().order_by('-fimfic_updated')
-    return _book_list(request, queryset, qtype, list_by='by-updated-fimfic')
-
-def by_publish_latest(request, qtype=None):
-    queryset = Book.objects.all().order_by('-dc_issued')
-    return _book_list(request, queryset, qtype, list_by='by-publish-latest')
-
-def by_publish_oldest(request, qtype=None):
-    queryset = Book.objects.all().order_by('dc_issued')
-    return _book_list(request, queryset, qtype, list_by='by-publish-oldest')
-
-def by_title(request, qtype=None):
-    queryset = Book.objects.all().order_by('a_title')
-    return _book_list(request, queryset, qtype, list_by='by-title')
-
-def by_likes(request, qtype=None):
-    queryset = Book.objects.all().order_by('-likes')
-    return _book_list(request, queryset, qtype, list_by='by-likes')
-
-def by_dislikes(request, qtype=None):
-    queryset = Book.objects.all().order_by('-dislikes')
-    return _book_list(request, queryset, qtype, list_by='by-dislikes')
-
-def by_words(request, qtype=None):
-    queryset = Book.objects.all().order_by('-words')
-    return _book_list(request, queryset, qtype, list_by='by-words')
-
-def by_comments(request, qtype=None):
-    queryset = Book.objects.all().order_by('-comments')
-    return _book_list(request, queryset, qtype, list_by='by-dislikes')
-
-def by_views(request, qtype=None):
-    queryset = Book.objects.all().order_by('-views')
-    return _book_list(request, queryset, qtype, list_by='by-views')
-
-def all_authors(request, qtype=None):
-    queryset = Author.objects.all().order_by('name')
-    return _authors_list(request, queryset, qtype)
-
-def by_author(request, author_id=None, qtype=None):
-    queryset = Author.objects.get( id = author_id ).book_set.all();
-    return _book_list(request, queryset, qtype, list_by='by_author')
-
-def by_tag(request, tag, qtype=None):
-    """ displays a book list by the tag argument """
-    # get the Tag object
-    tag_instance = tTag.objects.get(name=tag) # TODO replace as Tag when django-tagging is removed
-
-    # if the tag does not exist, return 404
-    if tag_instance is None:
-        raise Http404()
-
-    # Get a list of books that have the requested tag
-    queryset = Book.objects.filter(tags=tag_instance)
-    return _book_list(request, queryset, qtype, list_by='by-tag',
-                      tag=tag_instance)
-
-def most_downloaded(request, qtype=None):
-    queryset = Book.objects.all().order_by('-downloads')
-    return _book_list(request, queryset, qtype, list_by='most-downloaded')
-
-def opensearch_description_generate(request):
-    os = OpenSearch(ShortName=SEARCH_SHORTNAME, Description=SEARCH_DESCRIPTION)
-    template_querystring = '?q={searchTerms}'
-    protocol = 'https://' if request.is_secure() else 'http://'
-    
-    os.add_searchmethod( template=protocol+request.get_host()+reverse('latest')+template_querystring,
-                            type='text/html')
-    os.add_searchmethod( template=protocol+request.get_host()+reverse('latest_feed')+template_querystring,
-                            type='application/atom+xml;profile=opds-catalog')
-    
-    os.add_image( width=128, height=128, url=protocol+request.get_host()+'/static/images/128x128.png', type='image/png' )
-    os.add_image( width=64, height=64, url=protocol+request.get_host()+'/static/images/64x64.png', type='image/png' )
-    os.add_image( width=32, height=32, url=protocol+request.get_host()+'/static/images/32x32.png', type='image/png' )
-    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/static/images/16x16.png', type='image/png' )
-    
-    os.add_image( width=128, height=128, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
-    os.add_image( width=64, height=64, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
-    os.add_image( width=32, height=32, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
-    os.add_image( width=16, height=16, url=protocol+request.get_host()+'/favicon.ico', type='image/vnd.microsoft.icon' )
-    
-    return HttpResponse(os.generate_description(), mimetype='application/opensearchdescription+xml')
+    sio = StringIO()
+    navFeed.write(sio, 'UTF-8')
+    return HttpResponse(sio.getvalue(), content_type='application/atom+xml')
 
