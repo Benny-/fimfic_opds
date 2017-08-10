@@ -1,4 +1,5 @@
 import jsonapi_requests
+import urllib
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session, OAuth2
 from django.conf import settings
@@ -17,14 +18,17 @@ api = jsonapi_requests.Api.config({
     'AUTH': auth,
 })
 
-def getBooks(sort='date_modified', cursor=None):
-
+def getBooks(sort='date_modified', cursor=None, query=None):
     q = "?"
     q += 'fields[story]=title,cover_image,date_published,short_description,description_html,author,date_modified,cover_image,tags'
     q += '&fields[story_tag]=name'
     q += '&fields[user]=name'
     q += '&page[size]=100'
-    q += '&sort='+sort
+    q += '&sort=' + urllib.parse.quote(sort)
+    if cursor is not None:
+        q += '&page[cursor]=' + urllib.parse.quote(cursor)
+    if query is not None:
+        q += '&query=' + urllib.parse.quote(query)
     stories_endpoint = api.endpoint('stories' + q)
     api_response = stories_endpoint.get()
     return api_response

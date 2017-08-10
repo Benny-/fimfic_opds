@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is a heavy modified Pathagar book server made using the [Django](https://www.djangoproject.com/) framework. It is designed to - only - serve fimfiction.net ebook meta-data. It focuses on OPDS views & bulk import. HTML views and book management are removed.
+This is a heavy modified Pathagar book server made using the [Django](https://www.djangoproject.com/) framework. It is designed to - only - serve fimfiction.net ebook meta-data. It focuses on OPDS views. HTML views and book management are removed.
 
 See the [orginal code](https://github.com/PathagarBooks/pathagar) this project is based on.
 
@@ -27,30 +27,25 @@ pip install "ciso8601>=1.0.3" #ISO 8601 datetime parser
 Quickstart
 ==========
 
-* Install requirements
-
-    pip install -r requirements.pip
-
 * Edit settings.py to suite your needs and environment.
 
     It is crucial to change client_id and client_secret to valid values obtained from a fimfiction site admin.
 
 * In the Pathagar folder, run
 
-    python manage.py syncdb
+    `python manage.py syncdb`
 
   You will be asked to create an admin user during this stage. You can answer 'no' here.
 
 * To run the server in development mode, run
 
-    python manage.py runserver
+    `python manage.py runserver`
 
   This starts a server listening on localhost, port 8000
 
 * With your browser, access http://localhost:8000/fimfic/opds/
 
-* To run the server in a production environment, look at Django deployment
-  docs at : https://docs.djangoproject.com/en/1.11/howto/deployment/
+* To run the server in a production environment, look at [Django deployment docs](https://docs.djangoproject.com/en/1.11/howto/deployment/)
 
 OPDS
 ====
@@ -58,4 +53,10 @@ OPDS
 This server adheres to the OPDS specification:
 
 http://opds-spec.org
+
+
+License
+====
+
+[GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 

@@ -7,16 +7,17 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 
+from .opensearch import OpenSearch
 from .opds import Catalog, AcquisitionFeed, NavigationFeed, RootNavigationFeed
 from . import fimfic
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
 catalog = Catalog('fimfiction:full-catalog',
-                    'Fimfiction',
+                    'My Little Pony',
                     'Ebooks from fimfiction.net',
                     reverse_lazy('fimfic_opds_root'),
-                    reverse_lazy('fimfic_opds_search'),
+                    reverse_lazy('fimfic_opds_opensearchdescription'),
                     icon=settings.STATIC_URL+'images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png')
 
 # Transforms a image url to a 3th party transform image url (3th party image converter). See https://images.weserv.nl/
@@ -28,14 +29,20 @@ def imgUrlToOTFTransformUrl(url, format):
     parsed = urllib.parse.urlparse(url)
     return 'https://images.weserv.nl/?output='+format+'&url=' + urllib.parse.quote('ssl:' + parsed.netloc + parsed.path + ('?' if len(parsed.query)>0 else '') + parsed.query)
 
-def acquisitionFeed(request, sort, cursor=None):
-    api_response = fimfic.getBooks(sort, cursor)
-    next = None
+def acquisitionFeed(request, sort, cursor=None, query=None):
+    api_response = fimfic.getBooks(sort, cursor, query)
     prev = None
+    next = None
     if 'prev' in api_response.content.links:
-        pass
+        parsed = urllib.parse.urlparse(api_response.content.links['prev'])
+        prev_cursor = urllib.parse.parse_qs(parsed.query)['page[cursor]']
+        prev_cursor = prev_cursor[0]
+        prev = reverse('fimfic_opds_cursor', kwargs={'sort': sort, 'cursor': prev_cursor})
     if 'next' in api_response.content.links:
-        pass
+        parsed = urllib.parse.urlparse(api_response.content.links['next'])
+        next_cursor = urllib.parse.parse_qs(parsed.query)['page[cursor]']
+        next_cursor = next_cursor[0]
+        next = reverse('fimfic_opds_cursor', kwargs={'sort': sort, 'cursor': next_cursor})
     acquisitionFeed = AcquisitionFeed(catalog, prev=prev, next=next)
     for book in api_response.data:
     
@@ -57,13 +64,13 @@ def acquisitionFeed(request, sort, cursor=None):
         
         
             if 'thumbnail' in book.attributes['cover_image']:
-                image = book.attributes['cover_image']['full']
+                image = book.attributes['cover_image']['thumbnail']
                 
             if 'medium' in book.attributes['cover_image']:
-                image = book.attributes['cover_image']['full']
+                image = book.attributes['cover_image']['medium']
                 
             if 'large' in book.attributes['cover_image']:
-                image = book.attributes['cover_image']['full']
+                image = book.attributes['cover_image']['large']
                 
             if 'full' in book.attributes['cover_image']:
                 image = book.attributes['cover_image']['full']
@@ -98,11 +105,24 @@ def acquisitionFeed(request, sort, cursor=None):
     acquisitionFeed.write(sio, 'UTF-8')
     return HttpResponse(sio.getvalue(), content_type='application/atom+xml')
 
-def cursor():
-    return HttpResponse('TODO: acquisitionFeedCursor is not yet implemented', content_type='text/plain', status=501)
+def fimfic_opds_opensearch_description(request):
+    os = OpenSearch(ShortName=catalog.title, Description=catalog.subtitle)
+    
+    os.add_searchmethod(template=reverse('fimfic_opds_search',
+                        kwargs={'query': '{searchTerms}'}),
+                        type='application/atom+xml;profile=opds-catalog')
 
-def search(request):
-    return HttpResponse('TODO: Search is not yet implemented', content_type='text/plain', status=501)
+    os.add_image( width=128, height=128, url=settings.STATIC_URL+'/images/128x128.png', type='image/png' )
+    os.add_image( width=64, height=64, url=settings.STATIC_URL+'/images/64x64.png', type='image/png' )
+    os.add_image( width=32, height=32, url=settings.STATIC_URL+'/images/32x32.png', type='image/png' )
+    os.add_image( width=16, height=16, url=settings.STATIC_URL+'/images/16x16.png', type='image/png' )
+
+    os.add_image( width=128, height=128, url=settings.STATIC_URL+'/images/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=64, height=64, url=settings.STATIC_URL+'/images/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=32, height=32, url=settings.STATIC_URL+'/images/favicon.ico', type='image/vnd.microsoft.icon' )
+    os.add_image( width=16, height=16, url=settings.STATIC_URL+'/images/favicon.ico', type='image/vnd.microsoft.icon' )
+
+    return HttpResponse(os.generate_description(), content_type='application/opensearchdescription+xml')
 
 def fimfic_opds_root(request):
     navFeed = RootNavigationFeed(catalog)
