@@ -125,12 +125,13 @@ def acquisitionFeed(request, sort, cursor=None, query=None):
     acquisitionFeed.write(sio, 'UTF-8')
     return HttpResponse(sio.getvalue(), content_type='application/atom+xml')
 
+def search(request):
+    return acquisitionFeed(request, '-relevance', query=request.GET.get('q'))
+
 def fimfic_opds_opensearch_description(request):
     os = OpenSearch(ShortName=catalog.title, Description=catalog.subtitle)
     
-    os.add_searchmethod(template=reverse('fimfic_opds_search',
-                        kwargs={'query': '{searchTerms}'}),
-                        type='application/atom+xml;profile=opds-catalog')
+    os.add_searchmethod(template=request.build_absolute_uri(reverse('fimfic_opds_search')) + '?q={searchTerms}', type='application/atom+xml;profile=opds-catalog')
 
     os.add_image( width=128, height=128, url=settings.STATIC_URL+'/images/128x128.png', type='image/png' )
     os.add_image( width=64, height=64, url=settings.STATIC_URL+'/images/64x64.png', type='image/png' )

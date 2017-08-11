@@ -37,7 +37,6 @@ from datetime import datetime
 GENERATOR_TEXT = 'django-atompub'
 GENERATOR_ATTR = {
     'uri': 'http://code.google.com/p/django-atompub/',
-    'version': 'r33'
 }
 
 ## based on django.utils.feedgenerator.rfc3339_date

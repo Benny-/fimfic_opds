@@ -14,7 +14,7 @@ urlpatterns = [
     url(r'^opds/by_dislikes$',  views.acquisitionFeed, {'sort':'-num_dislikes'},name='fimfic_opds_by_dislikes'),
     
     url(r'^opds/cursor/(?P<sort>.+)/(?P<cursor>.+)$', views.acquisitionFeed, name='fimfic_opds_cursor'),
-    url(r'^opds/search/(?P<query>.+)$',  views.acquisitionFeed, {'sort':'-relevance'}, name='fimfic_opds_search'),
+    url(r'^opds/search$',  views.search, name='fimfic_opds_search'),
     url(r'^opds/search.xml$', views.fimfic_opds_opensearch_description, name='fimfic_opds_opensearchdescription'),
     url(r'^opds/$', views.fimfic_opds_root, name='fimfic_opds_root'),
 ]
