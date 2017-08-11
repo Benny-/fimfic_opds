@@ -53,7 +53,7 @@ class AcquisitionFeed(AtomFeed):
         self.catalog = catalog
         self.generated = datetime.datetime.now()
 
-    def addBookEntry(self, atom_id, title, published, summary, content_html, opds_url, thumbnail=None, image=None, categories=[], html_url=None):
+    def addBookEntry(self, atom_id, title, published, summary, content_html, opds_url, authors=[], thumbnail=None, image=None, categories=[], html_url=None):
         
         links=[
                 {'rel': 'http://opds-spec.org/acquisition', 'href': opds_url,'type': 'application/epub+zip'},
@@ -76,7 +76,8 @@ class AcquisitionFeed(AtomFeed):
             categories=categories,
             published=published,
             content=( {'type':'html'}, content_html ),
-            links=links
+            links=links,
+            authors=authors
         )
 
 class RootAcquisitionFeed(AtomFeed):

@@ -20,6 +20,19 @@ catalog = Catalog('fimfiction:full-catalog',
                     reverse_lazy('fimfic_opds_opensearchdescription'),
                     icon=settings.STATIC_URL+'images/elements_of_harmony_dictionary_icon_by_xtux345-d4myvo7.png')
 
+def getTags(book, api_response):
+    tags = []
+    for tag_ref in book.relationships['tags'].data:
+        for include in api_response.content.included:
+            if tag_ref.id == include.id and tag_ref.type == include.type:
+                tags.append(include.attributes['name'])
+    return tags
+
+def getAuthor(book, api_response):
+    for include in api_response.content.included:
+        if book.relationships['author'].data.id == include.id and book.relationships['author'].data.type == include.type:
+            return include
+
 # Transforms a image url to a 3th party transform image url (3th party image converter). See https://images.weserv.nl/
 # This is done to guarantee we always have a consistent format.
 def imgUrlToOTFTransformUrl(url, format):
@@ -89,6 +102,8 @@ def acquisitionFeed(request, sort, cursor=None, query=None):
         else:
             ciso8601.parse_datetime(book.attributes['date_published'])
         
+        author = getAuthor(book, api_response)
+        
         acquisitionFeed.addBookEntry(
                 'urn:fimfiction:' + book.id,
                 book.attributes['title'].strip(),
@@ -97,8 +112,13 @@ def acquisitionFeed(request, sort, cursor=None, query=None):
                 book.attributes['description_html'],
                 thumbnail=thumbnail,
                 image=image,
+                categories=getTags(book, api_response),
                 opds_url='http://fimfiction.djazz.se/story/{}/download/fimfic_{}.epub'.format(book.id, book.id),
-                html_url='https://www.fimfiction.net/story/'+book.id+'/'+urllib.parse.quote(book.attributes['title'].strip())
+                html_url='https://www.fimfiction.net/story/'+book.id+'/'+urllib.parse.quote(book.attributes['title'].strip()),
+                authors=[{
+                            'name':author.attributes['name'],
+                            'uri':'https://www.fimfiction.net/user/{}/{}'.format(urllib.parse.quote(author.id), urllib.parse.quote(author.attributes['name']))
+                        }]
             )
     
     sio = StringIO()

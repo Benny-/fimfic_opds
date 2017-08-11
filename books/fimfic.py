@@ -18,12 +18,11 @@ api = jsonapi_requests.Api.config({
     'AUTH': auth,
 })
 
-def getBooks(sort='date_modified', cursor=None, query=None):
-    q = "?"
-    q += 'fields[story]=title,cover_image,date_published,short_description,description_html,author,date_modified,cover_image,tags'
+def getBooks(sort='date_updated', cursor=None, query=None):
+    q  = '?fields[story]=title,cover_image,date_published,short_description,description_html,author,date_modified,cover_image,tags'
     q += '&fields[story_tag]=name'
     q += '&fields[user]=name'
-    q += '&page[size]=100'
+    q += '&page[size]=50'
     q += '&sort=' + urllib.parse.quote(sort)
     if cursor is not None:
         q += '&page[cursor]=' + urllib.parse.quote(cursor)
