@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     url(r'^opds/by_published$', views.acquisitionFeed, {'sort':'-date_published'},name='fimfic_opds_by_published'),
     url(r'^opds/by_hot$',       views.acquisitionFeed, {'sort':'-hotness'},name='fimfic_opds_by_hotness'),
-    url(r'^opds/by_update$',    views.acquisitionFeed, {'sort':'-date_modified'}, name='fimfic_opds_by_update'),
+    url(r'^opds/by_update$',    views.acquisitionFeed, {'sort':'-date_updated'}, name='fimfic_opds_by_update'),
     url(r'^opds/by_rating$',    views.acquisitionFeed, {'sort':'-rating'},name='fimfic_opds_by_rating'),
     url(r'^opds/by_words$',     views.acquisitionFeed, {'sort':'-num_words'},name='fimfic_opds_by_words'),
     url(r'^opds/by_views$',     views.acquisitionFeed, {'sort':'-num_views'},name='fimfic_opds_by_views'),

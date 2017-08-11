@@ -5,6 +5,8 @@ This is a heavy modified Pathagar book server made using the [Django](https://ww
 
 See the [orginal code](https://github.com/PathagarBooks/pathagar) this project is based on.
 
+This project depends on an [online fimfic2epub service](https://github.com/daniel-j/fimfic2epub-server).
+
 Requirements
 ============
 
@@ -29,13 +31,7 @@ Quickstart
 
 * Edit settings.py to suite your needs and environment.
 
-    It is crucial to change client_id and client_secret to valid values obtained from a fimfiction site admin.
-
-* In the Pathagar folder, run
-
-    `python manage.py syncdb`
-
-  You will be asked to create an admin user during this stage. You can answer 'no' here.
+    It is crucial to change `CLIENT_ID` and `CLIENT_SECRET` to valid values obtained from a fimfiction site admin.
 
 * To run the server in development mode, run
 
@@ -53,7 +49,6 @@ OPDS
 This server adheres to the OPDS specification:
 
 http://opds-spec.org
-
 
 License
 ====
