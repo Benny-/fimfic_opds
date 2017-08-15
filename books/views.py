@@ -40,6 +40,10 @@ def imgUrlToOTFTransformUrl(url, format):
 def acquisitionFeed(request, sort, cursor=None, query=None):
     api_response = fimfic.getBooks(sort, cursor, query)
     
+    protocol = "http"
+    if request.is_secure():
+        protocol = "https"
+    
     includedTypes = defaultdict(lambda: {})
     for include in api_response.content.included:
         includedTypes[include.type][include.id] = include
@@ -118,8 +122,8 @@ def acquisitionFeed(request, sort, cursor=None, query=None):
                 thumbnail=thumbnail,
                 image=image,
                 categories=getTags(book, includedTypes),
-                opds_url='http://fimfiction.djazz.se/story/{}/download/fimfic_{}.epub'.format(book.id, book.id),
-                html_url='https://www.fimfiction.net/story/'+book.id+'/'+urllib.parse.quote(book.attributes['title'].strip()),
+                opds_url=protocol+'://fimfic2epub.nl/story/{}/download/fimfic_{}.epub'.format(book.id, book.id),
+                html_url=protocol+'://www.fimfiction.net/story/'+book.id+'/'+urllib.parse.quote(book.attributes['title'].strip()),
                 authors=[{
                             'name':author.attributes['name'],
                             'uri':'https://www.fimfiction.net/user/{}/{}'.format(urllib.parse.quote(author.id), urllib.parse.quote(author.attributes['name']))
