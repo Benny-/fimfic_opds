@@ -24,7 +24,6 @@ def getBooks(sort='date_updated', cursor=None, query=None):
     q += '&fields[user]=name'
     q += '&page[size]=50'
     q += '&sort=' + urllib.parse.quote(sort)
-    print(query)
     if cursor is not None:
         q += '&page[cursor]=' + urllib.parse.quote(cursor)
     if query is not None:
